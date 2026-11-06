@@ -1,8 +1,8 @@
-﻿# Black Cat Tamagotchi for SillyTavern
+# Black Cat Tamagotchi for SillyTavern
 
-**English** · [Русский](README.ru.md)
+**English** | [На русском](README.ru.md)
 
-A tiny winged black cat lives in the corner of your SillyTavern screen. He sleeps in his little house, stretches, flies around, begs for cheese, plays with a ball of yarn and chats with you through any model you choose.
+A tiny black cat lives in the corner of your SillyTavern screen. He sleeps in his little house, stretches, begs for cheese, plays with a ball of yarn and chats with you through any model you choose. And sometimes he takes off and flies across your screen, distracting you from whatever you were doing, just like a real cat.
 
 The extension speaks **English or Russian**: it follows SillyTavern's interface language, and you can override it in the settings.
 

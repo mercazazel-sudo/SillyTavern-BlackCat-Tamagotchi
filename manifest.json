@@ -1,6 +1,6 @@
 {
   "display_name": "Black Cat Tamagotchi / Чёрный кот-тамагочи",
-  "description": "A tiny winged cat in the corner of your screen: sleeps in his house, flies, begs for cheese, plays and chats via the model you choose. / Мини-котик с крылышками в углу экрана: спит в домике, летает, просит сыр, играет и болтает через выбранную модель.",
+  "description": "A tiny cat in the corner of your screen: sleeps in his house, begs for cheese, plays, chats via the model you choose, and sometimes flies across your screen, distracting you like a real cat. / Мини-котик в углу экрана: спит в домике, просит сыр, играет, болтает через выбранную модель, а иногда летает по экрану, отвлекая от дел, как самый настоящий кот.",
   "loading_order": 50,
   "requires": [],
   "optional": [],
