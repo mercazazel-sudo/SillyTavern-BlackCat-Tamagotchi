@@ -1,4 +1,4 @@
-MIT License (код)
+MIT License
 
 Copyright (c) 2026 Azazel
 
@@ -19,8 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-Эта лицензия распространяется на программный код (файлы .js, .css, .py,
-manifest.json) и на интерфейсные спрайты в assets/ui/ (они генерируются
-скриптом tools/make_ui.py). Остальные изображения в папках assets/ и docs/
-ей НЕ охватываются, см. ASSETS-NOTICE.md.
