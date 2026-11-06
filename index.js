@@ -3,7 +3,8 @@
 
 import { createPanel } from './panel.js';
 import { initStats, tick, bump, sleepFactor, coffeeOn, HUNGRY_BELOW, TIRED_BELOW } from './stats.js';
-import { askCat, isMainBusy, looksFunny, isFragment, DEFAULT_CAT_PROMPT } from './chat.js';
+import { askCat, isMainBusy, looksFunny, isFragment } from './chat.js';
+import { initLang, t, tl, tpick, catNameOf, isDefaultPrompt } from './i18n.js';
 import { buildSettings } from './settings-ui.js';
 
 const MODULE = 'kotik';
@@ -12,7 +13,7 @@ const DEFAULTS = {
     enabled: true, size: 24,
     homeEnabled: true, homeScale: 100, homeRight: 12, homeBottom: 6,
     hungerMinutes: 10,
-    catName: 'Нуар', catPrompt: DEFAULT_CAT_PROMPT, catMode: 'main', catProfile: 'main', catMaxTokens: 120, chatContext: 4,
+    catName: '', catPrompt: '', lang: 'auto', catMode: 'main', catProfile: 'main', catMaxTokens: 120, chatContext: 4,
     commentsEnabled: true, commentMinutes: 10,
     sleepNeed: 100, coffeeEnabled: true, coffeeMinutes: 20, coffeeUntil: 0,
     flyFreq: 50, winScale: 1, winRight: null, winBottom: null, boxCxR: null, boxBottom: null,
@@ -83,6 +84,10 @@ function loadSettings() {
             if (st[key] === undefined) st[key] = DEFAULTS[key];
         }
         if (!Array.isArray(st.chatLog)) st.chatLog = [];
+        // стандартный характер храним пустым: он берётся по языку (русский для ru, английский для остальных)
+        if (isDefaultPrompt(st.catPrompt)) st.catPrompt = '';
+        // стандартное имя тоже храним пустым: «Нуар» по-русски, «Noir» по-английски
+        if (String(st.catName || '').trim() === 'Нуар') st.catName = '';
         // режим модели появился в v7: раньше выбор профиля означал «профиль», иначе «основная»
         if (old !== undefined && old < 7) st.catMode = (st.catProfile && st.catProfile !== 'main') ? 'profile' : 'main';
         st.catApi = { url: '', key: '', model: '', temperature: 0.9, ...(st.catApi && typeof st.catApi === 'object' ? st.catApi : {}) };
@@ -225,7 +230,7 @@ function buildDom() {
     hint = document.createElement('button');
     hint.id = 'kotik-hint';
     hint.className = 'kotik-ui';
-    hint.textContent = 'Покормить';
+    hint.textContent = t('hint.feed');
     hint.addEventListener('click', e => { e.stopPropagation(); toggleBox('cheese'); });
 
     pos.append(flip, zzzBox, hint);
@@ -803,19 +808,17 @@ async function bPetted(alive) {
 }
 
 // ---------- кофе ----------
-const COFFEE_ON_LINES = ['Кофе! Ну всё, теперь я не усну…', 'О-о-о… лапы трясутся. Я готов болтать!', 'Бодрость 100. Сон — для слабых.'];
-const COFFEE_AGAIN_LINES = ['Мне уже хватит, я и так вибрирую.', 'Второй кофе? Я сейчас взлечу без крыльев.'];
 
 function updateBuff() {
     if (!panel) return;
     const left = (Number(settings.coffeeUntil) || 0) - Date.now();
-    panel.setBuff(left > 0 ? `бодр ещё ${Math.max(1, Math.ceil(left / 60000))} мин` : '');
+    panel.setBuff(left > 0 ? t('buff', { n: Math.max(1, Math.ceil(left / 60000)) }) : '');
 }
 
 function drinkCoffee() {
     if (!ready || !settings.enabled || !settings.coffeeEnabled) return;
     if (coffeeOn(settings) && (settings.coffeeUntil - Date.now()) > 0.5 * (Number(settings.coffeeMinutes) || 20) * 60000) {
-        if (panel) panel.showBubble(COFFEE_AGAIN_LINES[Math.floor(Math.random() * COFFEE_AGAIN_LINES.length)], 3500);
+        if (panel) panel.showBubble(tpick('coffee.again'), 3500);
         return;                                          // свежая порция ещё действует
     }
     settings.coffeeUntil = Date.now() + (Number(settings.coffeeMinutes) || 20) * 60000;
@@ -844,7 +847,7 @@ function spawnCup() {
 async function bCoffee(alive) {
     if (!(await start(alive))) return;
     show(hasFrame('sit1') ? 'sit1' : 'angry');
-    if (panel) panel.showBubble(COFFEE_ON_LINES[Math.floor(Math.random() * COFFEE_ON_LINES.length)], 4200);
+    if (panel) panel.showBubble(tpick('coffee.on'), 4200);
     spawnCup();
     body.classList.add('kb-purr');
     const t0 = performance.now();
@@ -1205,12 +1208,8 @@ function reactLaugh() {
     go(bLaugh, bActivity);
 }
 
-const ZZZ_REPLIES = ['Zzz…', 'Zzzz… ммр… отстань…', 'Хррр… zzz…', '…zzz… ещё пять минуточек…', 'Zzzzz…'];
-const ANGRY_REPLIES = [
-    'Всё. Я проснулся. Доволен? Теперь я злой.',
-    'Я СПАЛ! Ты слово «zzz» вообще понимаешь?!',
-    'Ну всё, хозяин. Сам напросился.',
-];
+// реплики по кругу: спящий отмахивается, на четвёртый раз злится
+const nextFrom = key => { const list = tl(key); return list[zzzIdx++ % list.length]; };
 
 async function onPanelSend(text) {
     // спящий кот в чате не отвечает, а отмахивается; после трёх раз просыпается злым
@@ -1219,12 +1218,12 @@ async function onPanelSend(text) {
         lastSleepPoke = Date.now();
         sleepPokes++;
         if (sleepPokes > 3) {
-            const reply = ANGRY_REPLIES[zzzIdx++ % ANGRY_REPLIES.length];
+            const reply = nextFrom('angry');
             go(bWake);                                   // злится, счастье падает (см. bWake)
-            panel.showBubble('Ррр!', 2500);
+            panel.showBubble(t('growl'), 2500);
             return reply;
         }
-        const reply = ZZZ_REPLIES[zzzIdx++ % ZZZ_REPLIES.length];
+        const reply = nextFrom('zzz');
         panel.showBubble('Zzz…', 2500);
         return reply;
     }
@@ -1306,6 +1305,33 @@ function disable() {
     root.style.display = 'none';
 }
 
+// шестерёнка в окне тамагочи: открыть «Расширения», раскрыть наш раздел, прокрутить к нему и подсветить
+function openExtSettings() {
+    try {
+        const block = document.getElementById('rm_extensions_block');
+        const wasOpen = !!block && block.classList.contains('openDrawer');
+        if (!wasOpen) {
+            const toggle = document.querySelector('#extensions-settings-button .drawer-toggle');
+            if (toggle) toggle.click();
+        }
+        const wrap = document.querySelector('#extensions_settings2 .kset');
+        if (!wrap) { console.warn('[Kotik] раздел настроек не найден'); return; }
+        const header = wrap.querySelector(':scope > .inline-drawer > .inline-drawer-header');
+        const icon = header && header.querySelector('.inline-drawer-icon');
+        const opened = !!icon && icon.classList.contains('up');
+        if (header && !opened) header.click();
+        setTimeout(() => {
+            wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            wrap.classList.remove('kset-flash');
+            void wrap.offsetWidth;
+            wrap.classList.add('kset-flash');
+            setTimeout(() => wrap.classList.remove('kset-flash'), 1300);
+        }, wasOpen ? 80 : 450);
+    } catch (e) {
+        console.warn('[Kotik] не удалось открыть настройки', e);
+    }
+}
+
 function buildSettingsPanel() {
     const host = document.getElementById('extensions_settings2');
     if (!host) {
@@ -1328,8 +1354,8 @@ function buildSettingsPanel() {
             flyText: () => {
                 const f = Number(settings.flyFreq) || 0;
                 return f <= 0
-                    ? 'Не летает вообще. Из лежанки и обратно он перелетает всегда.'
-                    : `Примерно раз в ${Math.round(flyIntervalMs() / 60000)} мин. 100 = раз в 5 минут.`;
+                    ? t('set.beh.flyHintNone')
+                    : t('set.beh.flyHint', { n: Math.round(flyIntervalMs() / 60000) });
             },
             resetWindow: () => { if (panel) panel.resetLayout(); },
             debug: {
@@ -1344,6 +1370,7 @@ function buildSettingsPanel() {
 async function init() {
     try {
         loadSettings();
+        initLang(settings);
         await loadMeta();
         buildDom();
         stats = initStats(settings);
@@ -1354,6 +1381,7 @@ async function init() {
             onSend: onPanelSend,
             onToggle: () => updateUI(),
             getCatRect: () => catRect(),
+            onOpenSettings: () => openExtSettings(),
             layout: { z: settings.winScale, right: settings.winRight, bottom: settings.winBottom },
             onLayout: l => {
                 Object.assign(settings, { winScale: l.z, winRight: l.right, winBottom: l.bottom });
@@ -1361,7 +1389,7 @@ async function init() {
             },
             onLogChange: log => { settings.chatLog = log.slice(-30); saveSettings(); },
         });
-        panel.setName(settings.catName);
+        panel.setName(catNameOf(settings));
         panel.setCoffee(!!settings.coffeeEnabled);
         updateBuff();
         // вычищаем обрубки и сообщения об ошибках из сохранённого чата
@@ -1378,7 +1406,7 @@ async function init() {
         globalThis.__kotik = {
             state: () => ({ x, y, cur, inBed, hungry, home, token, drag: !!drag, size: settings.size, stats, standX: standX(), flyInMin: Math.round((nextFlyAt - Date.now()) / 600) / 100 }),
             go, show, becomeHungry, toggleBox, openBox, feed, panel, stat,
-            bWake, bFly, bPlay, bLaugh, bEat, bStretch, bSleep, bActivity, bDrop, bPetted, bWakeUp, bLick, bSit, sitTilt, springBody, bCoffee, drinkCoffee, updateBuff, giveItem, pet, reactLaugh, onPanelSend,
+            bWake, bFly, bPlay, bLaugh, bEat, bStretch, bSleep, bActivity, bDrop, bPetted, bWakeUp, bLick, bSit, sitTilt, springBody, bCoffee, drinkCoffee, updateBuff, openExtSettings, giveItem, pet, reactLaugh, onPanelSend,
         };
         if (settings.enabled) enable(); else root.style.display = 'none';
         console.log('[Kotik] v0.6 загружен');

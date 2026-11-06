@@ -1,5 +1,6 @@
 // Панель настроек расширения: вкладки, карточки, переключатели, выбор модели для кота.
-import { listProfiles, fetchModels, testCat, DEFAULT_CAT_PROMPT } from './chat.js';
+import { listProfiles, fetchModels, testCat } from './chat.js';
+import { t, catNameOf, isDefaultPrompt } from './i18n.js';
 
 const TAB_KEY = 'kotik_settings_tab';
 
@@ -11,11 +12,6 @@ const PRESETS = [
     ['Ollama', 'http://localhost:11434/v1'],
 ];
 
-const MODE_TEXT = {
-    main: 'Та же модель, что выбрана в Таверне. Ничего настраивать не нужно.',
-    profile: 'Профиль подключения из расширения Connection Manager.',
-    custom: 'Любой OpenAI-совместимый API: адрес, ключ и модель только для кота.',
-};
 
 function slider(id, label, min, max, step) {
     return `
@@ -44,7 +40,7 @@ export function buildSettings({ host, base, settings, save, hooks }) {
     wrap.innerHTML = `
     <div class="inline-drawer">
         <div class="inline-drawer-toggle inline-drawer-header">
-            <b>Котик-тамагочи</b>
+            <b>${t('ext.title')}</b>
             <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
         </div>
         <div class="inline-drawer-content">
@@ -52,144 +48,153 @@ export function buildSettings({ host, base, settings, save, hooks }) {
             <div class="kset-hero">
                 <div class="kset-avatar" style="background-image:url('${base}frames/pet1.png')"></div>
                 <div class="kset-hero-main">
-                    <input class="text_pole" id="kset_name" maxlength="24" placeholder="Имя кота">
-                    <small>Имя в заголовке окна и в характере кота</small>
+                    <input class="text_pole" id="kset_name" maxlength="24" placeholder="${t('set.hero.namePh')}">
+                    <small>${t('set.hero.nameHint')}</small>
                 </div>
-                <label class="kswitch kswitch-big" title="Показывать котика на экране">
+                <label class="kswitch kswitch-big" title="${t('set.hero.enabled')}">
                     <input type="checkbox" id="kset_enabled"><span></span>
                 </label>
             </div>
 
             <div class="kset-tabs" role="tablist">
-                <button class="kset-tab" data-tab="look">Вид</button>
-                <button class="kset-tab" data-tab="behavior">Поведение</button>
-                <button class="kset-tab" data-tab="brain">Чат и модель</button>
-                <button class="kset-tab" data-tab="debug">Отладка</button>
+                <button class="kset-tab" data-tab="look">${t('set.tab.look')}</button>
+                <button class="kset-tab" data-tab="behavior">${t('set.tab.behavior')}</button>
+                <button class="kset-tab" data-tab="brain">${t('set.tab.brain')}</button>
+                <button class="kset-tab" data-tab="debug">${t('set.tab.debug')}</button>
             </div>
 
             <!-- ВИД -->
             <div class="kset-pane" data-pane="look">
                 <section class="kset-card">
-                    <h4>Котик</h4>
-                    ${slider('kset_size', 'Размер (диаметр головы)', 12, 120, 2)}
+                    <h4>${t('set.look.lang')}</h4>
+                    <select id="kset_lang" class="text_pole kset-select">
+                        <option value="auto">${t('set.look.langAuto')}</option>
+                        <option value="ru">Русский</option>
+                        <option value="en">English</option>
+                    </select>
+                    <small class="kset-note">${t('set.look.langNote')}</small>
                 </section>
                 <section class="kset-card">
-                    <h4>Домик</h4>
-                    ${toggle('kset_home_on', 'Показывать домик', 'Лежанка и будка; без домика кот спит на полу')}
-                    ${slider('kset_home_scale', 'Размер домика', 40, 250, 5)}
+                    <h4>${t('set.look.cat')}</h4>
+                    ${slider('kset_size', t('set.look.size'), 12, 120, 2)}
                 </section>
                 <section class="kset-card">
-                    <h4>Окно тамагочи</h4>
-                    ${slider('kset_ui_scale', 'Масштаб окна, облачка и кнопки', 60, 240, 5)}
-                    <small class="kset-note">Окно двигается за заголовок и тянется за правый нижний угол. Котика, домик и коробку можно перетаскивать мышкой.</small>
-                    <div class="kset-actions"><button type="button" class="kbtn" id="kset_win_reset">Сбросить окно</button></div>
+                    <h4>${t('set.look.home')}</h4>
+                    ${toggle('kset_home_on', t('set.look.homeOn'), t('set.look.homeOnHint'))}
+                    ${slider('kset_home_scale', t('set.look.homeScale'), 40, 250, 5)}
+                </section>
+                <section class="kset-card">
+                    <h4>${t('set.look.win')}</h4>
+                    ${slider('kset_ui_scale', t('set.look.uiScale'), 60, 240, 5)}
+                    <small class="kset-note">${t('set.look.winNote')}</small>
+                    <div class="kset-actions"><button type="button" class="kbtn" id="kset_win_reset">${t('set.look.winReset')}</button></div>
                 </section>
             </div>
 
             <!-- ПОВЕДЕНИЕ -->
             <div class="kset-pane" data-pane="behavior">
                 <section class="kset-card">
-                    <h4>Полёты по экрану</h4>
-                    ${slider('kset_fly', 'Частота', 0, 100, 1)}
+                    <h4>${t('set.beh.fly')}</h4>
+                    ${slider('kset_fly', t('set.beh.flyFreq'), 0, 100, 1)}
                     <small class="kset-note" id="kset_fly_hint"></small>
                 </section>
                 <section class="kset-card">
-                    <h4>Сон</h4>
-                    ${slider('kset_sleep', 'Потребность во сне', 25, 250, 5)}
+                    <h4>${t('set.beh.sleep')}</h4>
+                    ${slider('kset_sleep', t('set.beh.sleepNeed'), 25, 250, 5)}
                     <small class="kset-note" id="kset_sleep_hint"></small>
                 </section>
                 <section class="kset-card">
-                    <h4>Кофе</h4>
-                    ${toggle('kset_coffee', 'Кнопка «Кофе» в окне', 'Если хочется поболтать подольше: кот меньше спит и дольше бодрствует. Не нравится? Выключи, кнопка исчезнет')}
-                    ${slider('kset_coffee_min', 'Сколько действует (мин)', 5, 60, 5)}
+                    <h4>${t('set.beh.coffee')}</h4>
+                    ${toggle('kset_coffee', t('set.beh.coffeeBtn'), t('set.beh.coffeeHint'))}
+                    ${slider('kset_coffee_min', t('set.beh.coffeeMin'), 5, 60, 5)}
                 </section>
                 <section class="kset-card">
-                    <h4>Голод</h4>
-                    ${slider('kset_hunger', 'Из сытого в голодного за (мин)', 1, 60, 1)}
+                    <h4>${t('set.beh.hunger')}</h4>
+                    ${slider('kset_hunger', t('set.beh.hungerMin'), 1, 60, 1)}
                 </section>
                 <section class="kset-card">
-                    <h4>Комментарии к чату</h4>
-                    ${toggle('kset_comments', 'Комментировать чат самому', 'Кот сам вставляет реплику про последнее сообщение; тратит токены выбранной модели')}
-                    ${slider('kset_comment_min', 'Не чаще, чем раз в (мин)', 1, 60, 1)}
+                    <h4>${t('set.beh.comments')}</h4>
+                    ${toggle('kset_comments', t('set.beh.commentsOn'), t('set.beh.commentsHint'))}
+                    ${slider('kset_comment_min', t('set.beh.commentMin'), 1, 60, 1)}
                 </section>
             </div>
 
             <!-- ЧАТ И МОДЕЛЬ -->
             <div class="kset-pane" data-pane="brain">
                 <section class="kset-card">
-                    <h4>Кто отвечает коту</h4>
+                    <h4>${t('set.brain.who')}</h4>
                     <div class="kseg" id="kset_mode">
-                        <button data-mode="main">Основная</button>
-                        <button data-mode="profile">Профиль</button>
-                        <button data-mode="custom">Свой API</button>
+                        <button data-mode="main">${t('set.brain.main')}</button>
+                        <button data-mode="profile">${t('set.brain.profile')}</button>
+                        <button data-mode="custom">${t('set.brain.custom')}</button>
                     </div>
                     <small class="kset-note" id="kset_mode_text"></small>
 
                     <div class="kset-mode" data-mode-panel="profile">
-                        <label for="kset_profile">Профиль подключения</label>
+                        <label for="kset_profile">${t('set.brain.profileLabel')}</label>
                         <div class="kset-inline">
                             <select id="kset_profile" class="text_pole"></select>
-                            <button type="button" class="kbtn" id="kset_profile_refresh" title="Обновить список">Обновить</button>
+                            <button type="button" class="kbtn" id="kset_profile_refresh" title="${t('set.brain.refreshTitle')}">${t('set.brain.refresh')}</button>
                         </div>
                         <small class="kset-note" id="kset_profile_hint"></small>
                     </div>
 
                     <div class="kset-mode" data-mode-panel="custom">
                         <div class="kset-presets">
-                            <span>Быстрый старт:</span>
+                            <span>${t('set.brain.quick')}</span>
                             ${PRESETS.map(([n, u]) => `<button type="button" class="kbtn kbtn-sm kset-preset" data-url="${u}">${n}</button>`).join('')}
                         </div>
-                        <label for="kset_url">Адрес API</label>
+                        <label for="kset_url">${t('set.brain.urlLabel')}</label>
                         <input class="text_pole" id="kset_url" placeholder="https://api.openai.com/v1" autocomplete="off" spellcheck="false">
-                        <small class="kset-note">Адрес с /v1, без /chat/completions.</small>
+                        <small class="kset-note">${t('set.brain.urlNote')}</small>
 
-                        <label for="kset_key">Ключ API</label>
+                        <label for="kset_key">${t('set.brain.keyLabel')}</label>
                         <div class="kset-inline">
-                            <input class="text_pole" id="kset_key" type="password" placeholder="sk-…  (для локальных моделей можно пусто)" autocomplete="off" spellcheck="false">
-                            <button type="button" class="kbtn" id="kset_key_eye" title="Показать или скрыть ключ">Показать</button>
+                            <input class="text_pole" id="kset_key" type="password" placeholder="${t('set.brain.keyPh')}" autocomplete="off" spellcheck="false">
+                            <button type="button" class="kbtn" id="kset_key_eye" title="${t('set.brain.showTitle')}">${t('set.brain.show')}</button>
                         </div>
-                        <small class="kset-note">Ключ хранится в настройках Таверны на этом компьютере и уходит только на указанный адрес.</small>
+                        <small class="kset-note">${t('set.brain.keyNote')}</small>
 
-                        <label for="kset_model">Модель</label>
+                        <label for="kset_model">${t('set.brain.modelLabel')}</label>
                         <div class="kset-inline">
-                            <input class="text_pole" id="kset_model" list="kset_models" placeholder="например, gpt-4o-mini" autocomplete="off" spellcheck="false">
-                            <button type="button" class="kbtn" id="kset_models_btn" title="Спросить у API список моделей">Список</button>
+                            <input class="text_pole" id="kset_model" list="kset_models" placeholder="${t('set.brain.modelPh')}" autocomplete="off" spellcheck="false">
+                            <button type="button" class="kbtn" id="kset_models_btn" title="${t('set.brain.listTitle')}">${t('set.brain.list')}</button>
                         </div>
                         <datalist id="kset_models"></datalist>
-                        <small class="kset-note" id="kset_models_hint">Впиши название или нажми «Список».</small>
-                        ${slider('kset_temp', 'Температура (разброс ответов)', 0, 1.5, 0.05)}
+                        <small class="kset-note" id="kset_models_hint">${t('set.brain.modelHint')}</small>
+                        ${slider('kset_temp', t('set.brain.temp'), 0, 1.5, 0.05)}
                     </div>
                 </section>
 
                 <section class="kset-card">
-                    <h4>Проверка связи</h4>
+                    <h4>${t('set.brain.test')}</h4>
                     <div class="kset-inline">
-                        <button type="button" class="kbtn kbtn-main" id="kset_test">Проверить связь</button>
+                        <button type="button" class="kbtn kbtn-main" id="kset_test">${t('set.brain.testBtn')}</button>
                         <span class="kset-status" id="kset_status"></span>
                     </div>
                 </section>
 
                 <section class="kset-card">
-                    <h4>Характер кота</h4>
+                    <h4>${t('set.brain.char')}</h4>
                     <textarea id="kset_prompt" class="text_pole" rows="8"></textarea>
-                    <small class="kset-note">{{cat}} в тексте заменяется именем кота.</small>
-                    <div class="kset-actions"><button type="button" class="kbtn" id="kset_prompt_reset">Сбросить характер</button></div>
-                    ${slider('kset_tokens', 'Длина ответа (токенов)', 40, 400, 10)}
-                    <small class="kset-note">Ограничивает длину реплики. Запас токенов на размышления модели добавляется сам.</small>
-                    ${slider('kset_ctx', 'Сообщений чата в контексте', 0, 10, 1)}
+                    <small class="kset-note">${t('set.brain.charNote')}</small>
+                    <div class="kset-actions"><button type="button" class="kbtn" id="kset_prompt_reset">${t('set.brain.charReset')}</button></div>
+                    ${slider('kset_tokens', t('set.brain.tokens'), 40, 400, 10)}
+                    <small class="kset-note">${t('set.brain.tokensNote')}</small>
+                    ${slider('kset_ctx', t('set.brain.ctx'), 0, 10, 1)}
                 </section>
             </div>
 
             <!-- ОТЛАДКА -->
             <div class="kset-pane" data-pane="debug">
                 <section class="kset-card">
-                    <h4>Быстрые действия</h4>
+                    <h4>${t('set.dbg.title')}</h4>
                     <div class="kset-actions">
-                        <button type="button" class="kbtn" id="kset_dbg_box">Коробка</button>
-                        <button type="button" class="kbtn" id="kset_dbg_hungry">Голод</button>
-                        <button type="button" class="kbtn" id="kset_dbg_wake">Разбудить</button>
+                        <button type="button" class="kbtn" id="kset_dbg_box">${t('set.dbg.box')}</button>
+                        <button type="button" class="kbtn" id="kset_dbg_hungry">${t('set.beh.hunger')}</button>
+                        <button type="button" class="kbtn" id="kset_dbg_wake">${t('set.dbg.wake')}</button>
                     </div>
-                    <small class="kset-note">Нужны, чтобы быстро посмотреть сцены, не дожидаясь их по расписанию.</small>
+                    <small class="kset-note">${t('set.dbg.note')}</small>
                 </section>
             </div>
 
@@ -224,11 +229,15 @@ export function buildSettings({ host, base, settings, save, hooks }) {
     /* ---------- шапка ---------- */
     $('#kset_name').value = settings.catName;
     $('#kset_name').addEventListener('input', e => {
-        settings.catName = e.target.value.trim() || 'Нуар';
-        hooks.onName && hooks.onName(settings.catName);
+        settings.catName = e.target.value.trim();
+        hooks.onName && hooks.onName(catNameOf(settings));
         save();
     });
     bindSwitch('kset_enabled', () => settings.enabled, v => { settings.enabled = v; }, v => hooks.setEnabled(v));
+
+    /* ---------- язык ---------- */
+    $('#kset_lang').value = settings.lang || 'auto';
+    $('#kset_lang').addEventListener('change', e => { settings.lang = e.target.value; save(); });
 
     /* ---------- вкладки ---------- */
     function showTab(name) {
@@ -253,22 +262,22 @@ export function buildSettings({ host, base, settings, save, hooks }) {
 
     /* ---------- поведение ---------- */
     const flyHint = () => { $('#kset_fly_hint').textContent = hooks.flyText(); };
-    bindSlider('kset_fly', () => settings.flyFreq, v => { settings.flyFreq = v; }, v => (v <= 0 ? 'не летает' : String(v)), () => { hooks.onFly(); flyHint(); });
+    bindSlider('kset_fly', () => settings.flyFreq, v => { settings.flyFreq = v; }, v => (v <= 0 ? t('set.beh.flyNone') : String(v)), () => { hooks.onFly(); flyHint(); });
     flyHint();
     const sleepHint = () => {
         const v = Number(settings.sleepNeed) || 100;
-        $('#kset_sleep_hint').textContent = v < 85 ? 'Бодрячок: спит коротко и устаёт нескоро.'
-            : v > 115 ? 'Соня: спит долго и быстро устаёт.' : 'Обычно: средний сон и средняя усталость.';
+        $('#kset_sleep_hint').textContent = v < 85 ? t('set.beh.sleepLow')
+            : v > 115 ? t('set.beh.sleepHigh') : t('set.beh.sleepMid');
     };
     bindSlider('kset_sleep', () => settings.sleepNeed, v => { settings.sleepNeed = v; }, v => `${v}%`, sleepHint);
     sleepHint();
     const syncCoffee = () => $('#kset_coffee_min').closest('.kset-row').classList.toggle('off', !settings.coffeeEnabled);
     bindSwitch('kset_coffee', () => settings.coffeeEnabled, v => { settings.coffeeEnabled = v; }, v => { hooks.onCoffee(v); syncCoffee(); });
-    bindSlider('kset_coffee_min', () => settings.coffeeMinutes, v => { settings.coffeeMinutes = v; }, v => `${v} мин`);
+    bindSlider('kset_coffee_min', () => settings.coffeeMinutes, v => { settings.coffeeMinutes = v; }, v => t('unit.min', { n: v }));
     syncCoffee();
-    bindSlider('kset_hunger', () => settings.hungerMinutes, v => { settings.hungerMinutes = v; }, v => `${v} мин`);
+    bindSlider('kset_hunger', () => settings.hungerMinutes, v => { settings.hungerMinutes = v; }, v => t('unit.min', { n: v }));
     bindSwitch('kset_comments', () => settings.commentsEnabled, v => { settings.commentsEnabled = v; }, v => syncComments());
-    bindSlider('kset_comment_min', () => settings.commentMinutes, v => { settings.commentMinutes = v; }, v => `${v} мин`);
+    bindSlider('kset_comment_min', () => settings.commentMinutes, v => { settings.commentMinutes = v; }, v => t('unit.min', { n: v }));
     const syncComments = () => $('#kset_comment_min').closest('.kset-row').classList.toggle('off', !settings.commentsEnabled);
     syncComments();
 
@@ -277,7 +286,7 @@ export function buildSettings({ host, base, settings, save, hooks }) {
         const m = settings.catMode || 'main';
         $$('#kset_mode button').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
         $$('.kset-mode').forEach(p => p.classList.toggle('on', p.dataset.modePanel === m));
-        $('#kset_mode_text').textContent = MODE_TEXT[m];
+        $('#kset_mode_text').textContent = t('set.brain.mode.' + m);
     }
     $$('#kset_mode button').forEach(b => b.addEventListener('click', () => {
         settings.catMode = b.dataset.mode;
@@ -293,15 +302,15 @@ export function buildSettings({ host, base, settings, save, hooks }) {
         const profiles = listProfiles();
         sel.innerHTML = '';
         const add = (v, t) => { const o = document.createElement('option'); o.value = v; o.textContent = t; sel.appendChild(o); };
-        if (!profiles.length) add('', 'Профилей нет');
+        if (!profiles.length) add('', t('set.brain.noProfiles'));
         profiles.forEach(p => add(p.id, p.name));
         const known = profiles.some(p => p.id === settings.catProfile);
-        if (!known && settings.catProfile && settings.catProfile !== 'main') add(settings.catProfile, `Профиль не найден (${settings.catProfile})`);
+        if (!known && settings.catProfile && settings.catProfile !== 'main') add(settings.catProfile, t('set.brain.profileMissing', { id: settings.catProfile }));
         sel.value = known || (settings.catProfile && settings.catProfile !== 'main') ? settings.catProfile : (profiles[0] ? profiles[0].id : '');
         if (sel.value && sel.value !== settings.catProfile) { settings.catProfile = sel.value; save(); }
         $('#kset_profile_hint').textContent = profiles.length
-            ? 'Профили создаются и настраиваются в расширении Connection Manager.'
-            : 'Профилей пока нет. Включи расширение Connection Manager и создай профиль, либо выбери «Свой API» рядом.';
+            ? t('set.brain.profileHint')
+            : t('set.brain.noProfilesHint');
     }
     fillProfiles();
     $('#kset_profile').addEventListener('change', e => { settings.catProfile = e.target.value || 'main'; save(); });
@@ -321,7 +330,7 @@ export function buildSettings({ host, base, settings, save, hooks }) {
         const inp = $('#kset_key');
         const show = inp.type === 'password';
         inp.type = show ? 'text' : 'password';
-        e.currentTarget.textContent = show ? 'Скрыть' : 'Показать';
+        e.currentTarget.textContent = show ? t('set.brain.hide') : t('set.brain.show');
     });
     $('#kset_model').value = api.model;
     $('#kset_model').addEventListener('input', e => { api.model = e.target.value.trim(); save(); });
@@ -332,13 +341,13 @@ export function buildSettings({ host, base, settings, save, hooks }) {
         const hint = $('#kset_models_hint');
         btn.classList.add('busy');
         hint.className = 'kset-note';
-        hint.textContent = 'Спрашиваю список моделей…';
+        hint.textContent = t('set.brain.asking');
         try {
             const ids = await fetchModels(settings);
             const dl = $('#kset_models');
             dl.innerHTML = '';
             ids.forEach(id => { const o = document.createElement('option'); o.value = id; dl.appendChild(o); });
-            hint.textContent = `Нашлось моделей: ${ids.length}. Начни вводить название или выбери из подсказки.`;
+            hint.textContent = t('set.brain.found', { n: ids.length });
             if (!api.model) { $('#kset_model').focus(); }
         } catch (err) {
             hint.className = 'kset-note err';
@@ -359,10 +368,10 @@ export function buildSettings({ host, base, settings, save, hooks }) {
         const btn = e.currentTarget;
         if (btn.classList.contains('busy')) return;
         btn.classList.add('busy');
-        setStatus('Отправляю запрос…', 'busy');
+        setStatus(t('set.brain.sending'), 'busy');
         try {
             const r = await testCat(settings);
-            setStatus(`Отвечает: «${r.text}» · ${(r.ms / 1000).toFixed(1)} с`, 'ok');
+            setStatus(t('set.brain.answers', { text: r.text, sec: (r.ms / 1000).toFixed(1) }), 'ok');
         } catch (err) {
             setStatus(err && err.message ? err.message : String(err), 'err');
             console.warn('[Kotik] проверка связи', err);
@@ -372,11 +381,11 @@ export function buildSettings({ host, base, settings, save, hooks }) {
     });
 
     // характер
-    $('#kset_prompt').value = settings.catPrompt;
-    $('#kset_prompt').addEventListener('input', e => { settings.catPrompt = e.target.value; save(); });
+    $('#kset_prompt').value = settings.catPrompt || t('prompt.default');
+    $('#kset_prompt').addEventListener('input', e => { settings.catPrompt = isDefaultPrompt(e.target.value) ? '' : e.target.value; save(); });
     $('#kset_prompt_reset').addEventListener('click', () => {
-        settings.catPrompt = DEFAULT_CAT_PROMPT;
-        $('#kset_prompt').value = settings.catPrompt;
+        settings.catPrompt = '';
+        $('#kset_prompt').value = t('prompt.default');
         save();
     });
     bindSlider('kset_tokens', () => settings.catMaxTokens, v => { settings.catMaxTokens = v; });

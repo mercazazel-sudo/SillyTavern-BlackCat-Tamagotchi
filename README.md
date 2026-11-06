@@ -1,72 +1,83 @@
-﻿# Р§С‘СЂРЅС‹Р№ РєРѕС‚-С‚Р°РјР°РіРѕС‡Рё РґР»СЏ SillyTavern
+﻿# Black Cat Tamagotchi for SillyTavern
 
-РњРёРЅРё-РєРѕС‚РёРє СЃ РєСЂС‹Р»С‹С€РєР°РјРё Р¶РёРІС‘С‚ РІ СѓРіР»Сѓ СЌРєСЂР°РЅР° SillyTavern: СЃРїРёС‚ РІ СЃРІРѕС‘Рј РґРѕРјРёРєРµ, РїРѕС‚СЏРіРёРІР°РµС‚СЃСЏ, Р»РµС‚Р°РµС‚, РїСЂРѕСЃРёС‚ СЃС‹СЂ, РёРіСЂР°РµС‚ СЃ РєР»СѓР±РєРѕРј Рё Р±РѕР»С‚Р°РµС‚ СЃ С‚РѕР±РѕР№. Р”Р»СЏ СЂР°Р·РіРѕРІРѕСЂР° РјРѕР¶РЅРѕ РІС‹Р±СЂР°С‚СЊ Р»СЋР±СѓСЋ РјРѕРґРµР»СЊ.
+**English** · [Русский](README.ru.md)
+
+A tiny winged black cat lives in the corner of your SillyTavern screen. He sleeps in his little house, stretches, flies around, begs for cheese, plays with a ball of yarn and chats with you through any model you choose.
+
+The extension speaks **English or Russian**: it follows SillyTavern's interface language, and you can override it in the settings.
 
 <p align="center">
-  <img src="docs/window.png" alt="РћРєРЅРѕ С‚Р°РјР°РіРѕС‡Рё Рё РєРѕС‚РёРє Сѓ РґРѕРјРёРєР°" width="420">
+  <img src="docs/window.en.png" alt="The tamagotchi window and the cat next to his house" width="420">
   &nbsp;
-  <img src="docs/settings.png" alt="РќР°СЃС‚СЂРѕР№РєРё СЂР°СЃС€РёСЂРµРЅРёСЏ" width="320">
+  <img src="docs/settings.en.png" alt="Extension settings" width="320">
 </p>
 
-## РЈСЃС‚Р°РЅРѕРІРєР°
+## Installation
 
-1. Р’ SillyTavern РѕС‚РєСЂРѕР№ **Р Р°СЃС€РёСЂРµРЅРёСЏ** (РёРєРѕРЅРєР° СЃ РєСѓР±РёРєР°РјРё) в†’ **РЈСЃС‚Р°РЅРѕРІРёС‚СЊ СЂР°СЃС€РёСЂРµРЅРёРµ**.
-2. Р’СЃС‚Р°РІСЊ СЃСЃС‹Р»РєСѓ:
+1. In SillyTavern open **Extensions** (the cubes icon) → **Install extension**.
+2. Paste the link:
    ```
    https://github.com/mercazazel-sudo/SillyTavern-BlackCat-Tamagotchi
    ```
-3. РќР°Р¶РјРё **Install** Рё РѕР±РЅРѕРІРё СЃС‚СЂР°РЅРёС†Сѓ (`Ctrl+F5`).
-4. РљРѕС‚РёРє РїРѕСЏРІРёС‚СЃСЏ СЃРїСЂР°РІР° РІРЅРёР·Сѓ. РќР°СЃС‚СЂРѕР№РєРё Р»РµР¶Р°С‚ РІ **Р Р°СЃС€РёСЂРµРЅРёСЏС… в†’ РљРѕС‚РёРє-С‚Р°РјР°РіРѕС‡Рё**.
+3. Press **Install**, then refresh the page (`Ctrl+F5`).
+4. The cat appears at the bottom right. The settings are under **Extensions → Cat Tamagotchi**, and the gear button in the tamagotchi window jumps straight to them.
 
-РџСЂРѕС‚РµСЃС‚РёСЂРѕРІР°РЅРѕ РЅР° SillyTavern 1.19.0. РћР±РЅРѕРІР»РµРЅРёСЏ РїРѕРґС‚СЏРіРёРІР°СЋС‚СЃСЏ РєРЅРѕРїРєРѕР№ РѕР±РЅРѕРІР»РµРЅРёСЏ СЂР°СЃС€РёСЂРµРЅРёР№.
+Tested on SillyTavern 1.19.0. Updates arrive through the extension update button.
 
-## Р§С‚Рѕ СѓРјРµРµС‚
+## What he does
 
-- **Р–РёРІС‘С‚ СЃР°Рј.** РЎРїРёС‚ РІ Р»РµР¶Р°РЅРєРµ, РїСЂРѕСЃС‹РїР°РµС‚СЃСЏ, РїРѕС‚СЏРіРёРІР°РµС‚СЃСЏ, СЃРёРґРёС‚ Рё СЃРјРѕС‚СЂРёС‚, РЅР°РєР»РѕРЅСЏРµС‚ РіРѕР»РѕРІСѓ Рё С€РµРІРµР»РёС‚ СѓС€РєР°РјРё, Р»РёР¶РµС‚ Р»Р°РїСѓ, РёРЅРѕРіРґР° Р»РµС‚Р°РµС‚ РїРѕ СЌРєСЂР°РЅСѓ.
-- **Р§РµС‚С‹СЂРµ С€РєР°Р»С‹:** РіРѕР»РѕРґ, СЃС‡Р°СЃС‚СЊРµ, Р»СЋР±РѕРІСЊ, СЃРѕРЅ. РћРЅРё РјРµРЅСЏСЋС‚СЃСЏ СЃРѕ РІСЂРµРјРµРЅРµРј Рё РІР»РёСЏСЋС‚ РЅР° РїРѕРІРµРґРµРЅРёРµ, РґР°Р¶Рµ РїРѕРєР° РўР°РІРµСЂРЅР° Р±С‹Р»Р° Р·Р°РєСЂС‹С‚Р° (РЅРµ РґРѕР»СЊС€Рµ 3 С‡Р°СЃРѕРІ).
-- **Р”РµР№СЃС‚РІРёСЏ** РІ РѕРєРЅРµ: РєРѕСЂРјРёС‚СЊ (С‚Р°С‰РёС€СЊ СЃС‹СЂ РёР· РєРѕСЂРѕР±РєРё РЅР° РєРѕС‚РёРєР°), РёРіСЂР°С‚СЊ (С‚Р°С‰РёС€СЊ РєР»СѓР±РѕРє), РіР»Р°РґРёС‚СЊ (РїРѕСЏРІР»СЏРµС‚СЃСЏ СЂСѓРєР° Рё РєРѕС‚РёРє РјСѓСЂР»С‹РєР°РµС‚), СЃРїР°С‚СЊ Рё, РїРѕ Р¶РµР»Р°РЅРёСЋ, РєРѕС„Рµ, С‡С‚РѕР±С‹ РѕРЅ РґРѕР»СЊС€Рµ Р±РѕРґСЂСЃС‚РІРѕРІР°Р».
-- **Р§Р°С‚ СЃ РєРѕС‚РёРєРѕРј** РІ РїРёРєСЃРµР»СЊРЅРѕРј РѕРєРЅРµ. РЎРїСЏС‰РёР№ РєРѕС‚РёРє РѕС‚РјР°С…РёРІР°РµС‚СЃСЏ В«ZzzвЂ¦В», Р° РµСЃР»Рё РїРёСЃР°С‚СЊ РµРјСѓ Р±РѕР»СЊС€Рµ С‚СЂС‘С… СЂР°Р·, Р·Р»РёС‚СЃСЏ, Рё СЃС‡Р°СЃС‚СЊРµ РїР°РґР°РµС‚.
-- **РљРѕРјРјРµРЅС‚Р°СЂРёРё Рє С‚РІРѕРµРјСѓ С‡Р°С‚Сѓ.** Р Р°Р· РІ РЅРµСЃРєРѕР»СЊРєРѕ РјРёРЅСѓС‚ РєРѕС‚РёРє СЃР°Рј РІСЃС‚Р°РІР»СЏРµС‚ СЂРµРїР»РёРєСѓ РїСЂРѕ РїРѕСЃР»РµРґРЅРµРµ СЃРѕРѕР±С‰РµРЅРёРµ, Р° РЅР° СЃРјРµС€РЅРѕРµ СЃРјРµС‘С‚СЃСЏ.
-- **Р’СЃС‘ РґРІРёРіР°РµС‚СЃСЏ РјС‹С€РєРѕР№:** РєРѕС‚РёРє, РґРѕРјРёРє, РєРѕСЂРѕР±РєР° СЃ РµРґРѕР№ Рё СЃР°РјРѕ РѕРєРЅРѕ. РћРєРЅРѕ РјР°СЃС€С‚Р°Р±РёСЂСѓРµС‚СЃСЏ Р·Р° РїСЂР°РІС‹Р№ РЅРёР¶РЅРёР№ СѓРіРѕР».
+- **Lives on his own.** Sleeps in his bed, wakes up, stretches, sits and looks around, tilts his head and wiggles his ears, licks his paw, sometimes flies across the screen.
+- **Four gauges:** hunger, happiness, love, sleep. They change over time and drive his behavior, even while SillyTavern was closed (up to 3 hours).
+- **Actions** in the window: feed (drag cheese from the box onto the cat), play (drag a ball of yarn), pet (a hand appears and he purrs), sleep and, optionally, coffee to keep him awake longer.
+- **Chat with the cat** in a pixel-art window. A sleeping cat only mumbles "Zzz…", and if you keep writing more than three times he gets angry and his happiness drops.
+- **Comments on your chat.** Every few minutes the cat adds a remark about the latest message, and laughs at funny ones.
+- **Everything can be dragged:** the cat, his house, the food box and the window itself. The window scales by its bottom-right corner.
+- **Settings in one click:** the gear button in the window opens the extension's settings.
 
-## РљР°РєР°СЏ РјРѕРґРµР»СЊ РѕС‚РІРµС‡Р°РµС‚ РєРѕС‚Сѓ
+## Which model answers the cat
 
-РќР° РІРєР»Р°РґРєРµ **Р§Р°С‚ Рё РјРѕРґРµР»СЊ** С‚СЂРё СЂРµР¶РёРјР°:
+The **Chat & model** tab has three modes:
 
-| Р РµР¶РёРј | Р§С‚Рѕ СЌС‚Рѕ |
+| Mode | What it is |
 |---|---|
-| **РћСЃРЅРѕРІРЅР°СЏ** | РўР° Р¶Рµ РјРѕРґРµР»СЊ, С‡С‚Рѕ РІС‹Р±СЂР°РЅР° РІ РўР°РІРµСЂРЅРµ. РќРёС‡РµРіРѕ РІРІРѕРґРёС‚СЊ РЅРµ РЅСѓР¶РЅРѕ. |
-| **РџСЂРѕС„РёР»СЊ** | РџСЂРѕС„РёР»СЊ РїРѕРґРєР»СЋС‡РµРЅРёСЏ РёР· СЂР°СЃС€РёСЂРµРЅРёСЏ Connection Manager. |
-| **РЎРІРѕР№ API** | Р›СЋР±РѕР№ OpenAI-СЃРѕРІРјРµСЃС‚РёРјС‹Р№ API: Р°РґСЂРµСЃ, РєР»СЋС‡, РјРѕРґРµР»СЊ С‚РѕР»СЊРєРѕ РґР»СЏ РєРѕС‚Р°. Р•СЃС‚СЊ Р±С‹СЃС‚СЂС‹Р№ СЃС‚Р°СЂС‚ РґР»СЏ OpenAI, OpenRouter, LM Studio Рё Ollama. |
+| **Main** | The same model selected in SillyTavern. Nothing to configure. |
+| **Profile** | A connection profile from the Connection Manager extension. |
+| **Own API** | Any OpenAI-compatible API: address, key and model just for the cat. Quick-start buttons for OpenAI, OpenRouter, LM Studio and Ollama. |
 
-РљРЅРѕРїРєР° **РџСЂРѕРІРµСЂРёС‚СЊ СЃРІСЏР·СЊ** С€Р»С‘С‚ РєРѕСЂРѕС‚РєРёР№ Р·Р°РїСЂРѕСЃ Рё РїРѕРєР°Р·С‹РІР°РµС‚, РѕС‚РІРµС‡Р°РµС‚ Р»Рё РєРѕС‚. РҐР°СЂР°РєС‚РµСЂ РєРѕС‚Р° СЂРµРґР°РєС‚РёСЂСѓРµС‚СЃСЏ С‚Р°Рј Р¶Рµ (РІ С‚РµРєСЃС‚Рµ `{{cat}}` РїРѕРґСЃС‚Р°РІР»СЏРµС‚СЃСЏ РёРјСЏ).
+The **Test connection** button sends a short request and shows whether the cat answers. The cat's personality is edited on the same tab (`{{cat}}` in the text is replaced by his name).
 
-### Р’Р°Р¶РЅРѕ РїСЂРѕ РїСЂРёРІР°С‚РЅРѕСЃС‚СЊ
+### Privacy
 
-- РўРІРѕРё СЃРѕРѕР±С‰РµРЅРёСЏ РєРѕС‚Сѓ Рё РїРѕСЃР»РµРґРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ РёР· С‡Р°С‚Р° РўР°РІРµСЂРЅС‹ СѓС…РѕРґСЏС‚ **С‚РѕР№ РјРѕРґРµР»Рё, РєРѕС‚РѕСЂСѓСЋ С‚С‹ РІС‹Р±СЂР°Р» РґР»СЏ РєРѕС‚Р°**. Р•СЃР»Рё СЌС‚Рѕ РІРЅРµС€РЅРёР№ СЃРµСЂРІРёСЃ, РѕРЅРё СѓС…РѕРґСЏС‚ РµРјСѓ.
-- РљР»СЋС‡ СЃРѕР±СЃС‚РІРµРЅРЅРѕРіРѕ API С…СЂР°РЅРёС‚СЃСЏ РІ РЅР°СЃС‚СЂРѕР№РєР°С… SillyTavern **РѕС‚РєСЂС‹С‚С‹Рј С‚РµРєСЃС‚РѕРј** РЅР° С‚РІРѕС‘Рј РєРѕРјРїСЊСЋС‚РµСЂРµ Рё РѕС‚РїСЂР°РІР»СЏРµС‚СЃСЏ С‚РѕР»СЊРєРѕ РЅР° СѓРєР°Р·Р°РЅРЅС‹Р№ Р°РґСЂРµСЃ. РќРµ РѕС‚РїСЂР°РІР»СЏР№ РґСЂСѓРіРёРј С„Р°Р№Р» `settings.json`.
-- РЎР°РјРѕСЃС‚РѕСЏС‚РµР»СЊРЅС‹Рµ РєРѕРјРјРµРЅС‚Р°СЂРёРё С‚СЂР°С‚СЏС‚ С‚РѕРєРµРЅС‹. РС… РјРѕР¶РЅРѕ РІС‹РєР»СЋС‡РёС‚СЊ РЅР° РІРєР»Р°РґРєРµ **РџРѕРІРµРґРµРЅРёРµ**.
+- Your messages to the cat and the latest messages from the SillyTavern chat go to **the model you picked for the cat**. If that is an external service, they go to it.
+- The key of your own API is stored in SillyTavern's settings **in plain text** on your computer and is sent only to the address you specify. Do not share your `settings.json`.
+- The cat's own comments cost tokens. You can turn them off on the **Behavior** tab.
 
-## Р•СЃР»Рё РєРѕС‚ РѕС‚РІРµС‡Р°РµС‚ РѕР±СЂСѓР±РєР°РјРё
+## If the cat answers with fragments
 
-Р•СЃР»Рё РѕС‚РІРµС‚С‹ РїРѕС…РѕР¶Рё РЅР° В«РќР°СЃС‚СЂРѕВ» РёР»Рё В«РљРЅРёВ», Р° РЅР° РїСЂРѕРІРµСЂРєРµ СЃРІСЏР·Рё РІС‹Р»РµР·Р°РµС‚ РѕС€РёР±РєР° РїСЂРѕ РѕР±СЂСѓР±РѕРє, Р·РЅР°С‡РёС‚, РјРѕРґРµР»СЊ СЃ В«СЂР°СЃСЃСѓР¶РґРµРЅРёСЏРјРёВ» С‚СЂР°С‚РёС‚ РІРµСЃСЊ РѕС‚РІРµС‚ РЅР° РјС‹СЃР»Рё. Р Р°СЃС€РёСЂРµРЅРёРµ СЃР°РјРѕ РґР°С‘С‚ Р·Р°РїР°СЃ С‚РѕРєРµРЅРѕРІ Рё РїРѕРІС‚РѕСЂСЏРµС‚ Р·Р°РїСЂРѕСЃ, РЅРѕ РµСЃР»Рё РЅРµ РїРѕРјРѕРіР°РµС‚, РІС‹Р±РµСЂРё РґР»СЏ РєРѕС‚Р° РјРѕРґРµР»СЊ Р±РµР· СЂР°СЃСЃСѓР¶РґРµРЅРёР№ (СЂРµР¶РёРј **РЎРІРѕР№ API** РёР»Рё **РџСЂРѕС„РёР»СЊ**).
+If replies look like "Nast" or "Kni" and the connection test reports a cut-off reply, the model is a "reasoning" one and spends the whole answer on its thoughts. The extension gives it a token reserve and retries, but if that is not enough, choose a non-reasoning model for the cat (**Own API** or **Profile**).
 
-РЎС‹СЂС‹Рµ РѕС‚РІРµС‚С‹ РјРѕРґРµР»Рё РјРѕР¶РЅРѕ РїРѕСЃРјРѕС‚СЂРµС‚СЊ РІ РєРѕРЅСЃРѕР»Рё Р±СЂР°СѓР·РµСЂР° (`F12`), СЃС‚СЂРѕРєРё `[Kotik] РѕС‚РІРµС‚ РјРѕРґРµР»Рё`.
+You can see the raw model replies in the browser console (`F12`), lines `[Kotik] ответ модели`.
 
-## Р”Р»СЏ СЂР°Р·СЂР°Р±РѕС‚С‡РёРєРѕРІ
+## Languages
 
-РЎРїСЂР°Р№С‚С‹ СЃРѕР±РёСЂР°СЋС‚СЃСЏ СЃРєСЂРёРїС‚Р°РјРё РёР· `tools/` (РЅСѓР¶РЅС‹ `pillow`, `numpy`, `scipy`). РСЃС…РѕРґРЅС‹Рµ РєР°СЂС‚РёРЅРєРё РІ СЂРµРїРѕР·РёС‚РѕСЂРёР№ РЅРµ РІС…РѕРґСЏС‚:
+The language follows SillyTavern's interface: **Russian** for Russian locales, **English** for everything else. You can force it on the **Look** tab (Auto / Русский / English); it applies after a page refresh. The language also controls the cat's own speech: his default personality, his instructions to the model and his lines.
+
+A custom personality you wrote yourself is never replaced when the language changes. To add another language, add a dictionary to `i18n.js`.
+
+## For developers
+
+The sprites are built with scripts from `tools/` (they need `pillow`, `numpy`, `scipy`). The source images are not part of the repository:
 
 ```
-python tools/process.py <РїР°РїРєР°_СЃ_РёСЃС…РѕРґРЅС‹РјРё_РєР°РґСЂР°РјРё> [РїР°РїРєР°_assets]
-python tools/make_ui.py <РїР°РїРєР°_РґР»СЏ_РёРЅС‚РµСЂС„РµР№СЃР°>
+python tools/process.py <folder_with_source_frames> [assets_folder]
+python tools/make_ui.py <folder_for_ui_sprites>
 ```
 
-РЎС‚СЂСѓРєС‚СѓСЂР°: `index.js` (РїРѕРІРµРґРµРЅРёРµ Рё СЃС†РµРЅС‹), `panel.js` (РѕРєРЅРѕ), `settings-ui.js` (РЅР°СЃС‚СЂРѕР№РєРё), `chat.js` (Р·Р°РїСЂРѕСЃС‹ Рє РјРѕРґРµР»Рё), `stats.js` (С€РєР°Р»С‹).
+Layout: `index.js` (behavior and scenes), `panel.js` (window), `settings-ui.js` (settings), `chat.js` (model requests), `stats.js` (gauges), `i18n.js` (translations).
 
-## Р›РёС†РµРЅР·РёСЏ
+## License
 
-- **РљРѕРґ:** MIT, СЃРј. [LICENSE](LICENSE).
-- **РљР°СЂС‚РёРЅРєРё:** СЌС‚Рѕ С„Р°РЅР°СЂС‚, Рё MIT РЅР° РЅРёС… **РЅРµ СЂР°СЃРїСЂРѕСЃС‚СЂР°РЅСЏРµС‚СЃСЏ**. РўРѕР»СЊРєРѕ Р»РёС‡РЅРѕРµ РЅРµРєРѕРјРјРµСЂС‡РµСЃРєРѕРµ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ, РїРѕРґСЂРѕР±РЅРѕСЃС‚Рё РІ [ASSETS-NOTICE.md](ASSETS-NOTICE.md). РџСЂР°РІРѕРѕР±Р»Р°РґР°С‚РµР»Рё РјРѕРіСѓС‚ РЅР°РїРёСЃР°С‚СЊ РІ Issues, Рё РёР·РѕР±СЂР°Р¶РµРЅРёРµ СѓР±РµСЂСѓС‚.
+- **Code and UI sprites (`assets/ui/`):** MIT, see [LICENSE](LICENSE).
+- **Artwork:** this is fan art and the MIT license does **not** cover it. Personal, non-commercial use only, details in [ASSETS-NOTICE.md](ASSETS-NOTICE.md). Rights holders can write to Issues and the image will be removed.
 
-РђРІС‚РѕСЂ: Azazel.
+Author: Azazel.

@@ -178,6 +178,30 @@ def coffee_cup(shape):
     shape("S", lambda d: d.point([(3, 2), (4, 1), (3, 0), (6, 2), (7, 1), (6, 0)], fill=1))
 
 
+GEAR = [
+    ".....GG.....",
+    "..GG.GG.GG..",
+    "..GGGGGGGG..",
+    ".GGGGGGGGGG.",
+    ".GGGGGGGGGG.",
+    "GGGGGkkGGGGG",
+    "GGGGGkkGGGGG",
+    ".GGGGGGGGGG.",
+    ".GGGGGGGGGG.",
+    "..GGGGGGGG..",
+    "..GG.GG.GG..",
+    ".....GG.....",
+]
+
+
+def gear(shape):
+    g = [(x, y) for y, row in enumerate(GEAR) for x, ch in enumerate(row) if ch == "G"]
+    k = [(x, y) for y, row in enumerate(GEAR) for x, ch in enumerate(row) if ch == "k"]
+    shape("G", lambda d: d.point(g, fill=1))
+    shape("K", lambda d: d.point(k, fill=1))
+
+
+icon("i_gear.png", gear)
 icon("i_coffee.png", coffee_cup)
 icon("i_paw.png", paw)
 icon("i_paw_dim.png", lambda sh: paw(sh, "d"))

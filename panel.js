@@ -1,5 +1,6 @@
 // Окно тамагочи: шкалы сверху, кнопки действий, чат снизу. Плюс кнопка-лапка и облачко над котиком.
-import { KEYS, LABELS, ICONS } from './stats.js';
+import { KEYS, ICONS } from './stats.js';
+import { t } from './i18n.js';
 
 const SEGMENTS = 20;
 const LOG_LIMIT = 40;
@@ -13,7 +14,7 @@ function h(tag, cls, text) {
     return el;
 }
 
-export function createPanel({ ui, root, onAction, onSend, onToggle, onLogChange, getCatRect, layout = {}, onLayout }) {
+export function createPanel({ ui, root, onAction, onSend, onToggle, onLogChange, getCatRect, layout = {}, onLayout, onOpenSettings }) {
     const ico = (name, cls = 'kw-ico') => {
         const i = document.createElement('img');
         i.src = ui + name;
@@ -26,7 +27,7 @@ export function createPanel({ ui, root, onAction, onSend, onToggle, onLogChange,
     /* ---------- кнопка-лапка (открывает окно) ---------- */
     const toggle = h('button', 'ktoggle kotik-ui');
     toggle.id = 'kotik-toggle';
-    toggle.title = 'Нуар';
+    toggle.title = t('name.default');
     toggle.appendChild(ico('i_paw.png', 'ktoggle-ico'));
     toggle.addEventListener('click', e => { e.stopPropagation(); api.toggle(); onToggle && onToggle(api.isOpen()); });
 
@@ -36,11 +37,19 @@ export function createPanel({ ui, root, onAction, onSend, onToggle, onLogChange,
     win.style.display = 'none';
 
     const title = h('div', 'kw-title');
-    const nameEl = h('span', 'kw-name', 'Нуар');
+    const nameEl = h('span', 'kw-name', t('name.default'));
     const closeBtn = h('button', 'kw-btn kw-x');
     closeBtn.appendChild(ico('i_close.png'));
     closeBtn.addEventListener('click', () => { api.close(); onToggle && onToggle(false); });
-    title.append(ico('i_paw.png'), nameEl, closeBtn);
+    const gearBtn = h('button', 'kw-btn kw-x kw-gear');
+    gearBtn.title = t('panel.gear');
+    gearBtn.appendChild(ico('i_gear.png'));
+    gearBtn.addEventListener('click', e => { e.stopPropagation(); onOpenSettings && onOpenSettings(); });
+    const buffEl = h('span', 'kw-buff', '');
+    buffEl.style.display = 'none';
+    const tools = h('div', 'kw-tools');
+    tools.append(buffEl, gearBtn, closeBtn);
+    title.append(ico('i_paw.png'), nameEl, tools);
 
     const statsBox = h('div', 'kw-stats');
     const rows = {};
@@ -50,18 +59,18 @@ export function createPanel({ ui, root, onAction, onSend, onToggle, onLogChange,
         const segs = [];
         for (let i = 0; i < SEGMENTS; i++) { const s = h('span', 'kw-seg'); bar.appendChild(s); segs.push(s); }
         const val = h('span', 'kw-val', '0%');
-        row.append(ico(ICONS[k]), h('span', 'kw-lbl', LABELS[k]), bar, val);
+        row.append(ico(ICONS[k]), h('span', 'kw-lbl', t('stat.' + k)), bar, val);
         statsBox.appendChild(row);
         rows[k] = { bar, segs, val };
     }
 
     const actions = h('div', 'kw-actions');
     const ACTIONS = [
-        ['feed', 'Кормить', 'i_hunger.png'],
-        ['play', 'Играть', 'i_happy.png'],
-        ['pet', 'Гладить', 'i_love.png'],
-        ['sleep', 'Спать', 'i_sleep.png'],
-        ['coffee', 'Кофе', 'i_coffee.png'],
+        ['feed', t('act.feed'), 'i_hunger.png'],
+        ['play', t('act.play'), 'i_happy.png'],
+        ['pet', t('act.pet'), 'i_love.png'],
+        ['sleep', t('act.sleep'), 'i_sleep.png'],
+        ['coffee', t('act.coffee'), 'i_coffee.png'],
     ];
     const actBtns = {};
     for (const [id, label, icon] of ACTIONS) {
@@ -71,9 +80,7 @@ export function createPanel({ ui, root, onAction, onSend, onToggle, onLogChange,
         actions.appendChild(b);
         actBtns[id] = b;
     }
-    const buffEl = h('span', 'kw-buff', '');
-    buffEl.style.display = 'none';
-    title.insertBefore(buffEl, closeBtn);
+
 
     const divider = h('div', 'kw-div');
 
@@ -81,16 +88,16 @@ export function createPanel({ ui, root, onAction, onSend, onToggle, onLogChange,
     const form = h('div', 'kw-form');
     const input = h('input', 'kw-in');
     input.type = 'text';
-    input.placeholder = 'Сказать коту…';
+    input.placeholder = t('panel.placeholder');
     input.maxLength = 400;
     input.autocomplete = 'off';
     const send = h('button', 'kw-btn kw-send');
-    send.title = 'Отправить';
+    send.title = t('panel.send');
     send.appendChild(ico('i_paw.png'));
     form.append(input, send);
 
     const grip = h('div', 'kw-grip kotik-ui');
-    grip.title = 'Потяни, чтобы изменить масштаб окна';
+    grip.title = t('panel.grip');
     win.append(title, statsBox, actions, divider, log, form, grip);
 
     // размер и положение: right/bottom = расстояние до краёв экрана, null = автоматически над домиком
@@ -198,7 +205,7 @@ export function createPanel({ ui, root, onAction, onSend, onToggle, onLogChange,
             if (reply) api.addMsg('cat', reply);
         } catch (e) {
             typing.remove();
-            api.addMsg('sys', 'Мяу? Не вышло: ' + (e && e.message ? e.message : e));
+            api.addMsg('sys', t('chat.fail', { msg: e && e.message ? e.message : e }));
             console.error('[Kotik] ошибка чата', e);
         } finally {
             api.setBusy(false);
@@ -215,7 +222,7 @@ export function createPanel({ ui, root, onAction, onSend, onToggle, onLogChange,
     const api = {
         el: win, toggleEl: toggle, bubbleEl: bubble,
 
-        setName(name) { nameEl.textContent = (name || 'Нуар').toUpperCase(); toggle.title = name || 'Нуар'; },
+        setName(name) { nameEl.textContent = (name || t('name.default')).toUpperCase(); toggle.title = name || t('name.default'); },
 
         setStats(s) {
             for (const k of KEYS) {

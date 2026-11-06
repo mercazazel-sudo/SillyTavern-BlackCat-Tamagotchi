@@ -1,7 +1,6 @@
 // Шкалы тамагочи: голод, счастье, любовь, сон. Все от 0 до 100, полная шкала = хорошо.
 
 export const KEYS = ['hunger', 'happy', 'love', 'sleep'];
-export const LABELS = { hunger: 'Голод', happy: 'Счастье', love: 'Любовь', sleep: 'Сон' };
 export const ICONS = { hunger: 'i_hunger.png', happy: 'i_happy.png', love: 'i_love.png', sleep: 'i_sleep.png' };
 export const HUNGRY_BELOW = 30;       // ниже этого котик просит еду
 export const TIRED_BELOW = 20;        // ниже этого сам идёт спать

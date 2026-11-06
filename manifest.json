@@ -1,13 +1,13 @@
 {
-  "display_name": "Чёрный кот-тамагочи",
-  "description": "Мини-котик с крылышками в углу экрана: спит в домике, летает, просит сыр, играет с клубком и болтает с тобой через выбранную модель.",
+  "display_name": "Black Cat Tamagotchi / Чёрный кот-тамагочи",
+  "description": "A tiny winged cat in the corner of your screen: sleeps in his house, flies, begs for cheese, plays and chats via the model you choose. / Мини-котик с крылышками в углу экрана: спит в домике, летает, просит сыр, играет и болтает через выбранную модель.",
   "loading_order": 50,
   "requires": [],
   "optional": [],
   "js": "index.js",
   "css": "style.css",
   "author": "Azazel",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "homepage": "https://github.com/mercazazel-sudo/SillyTavern-BlackCat-Tamagotchi",
   "auto_update": true
 }
