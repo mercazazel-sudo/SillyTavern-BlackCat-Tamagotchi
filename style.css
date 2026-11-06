@@ -1,0 +1,772 @@
+/* Котик-тамагочи v0.2 */
+
+#kotik-root {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    z-index: 9000;
+    pointer-events: none;
+}
+
+#kotik-pos {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    will-change: transform;
+}
+
+#kotik-flip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+}
+
+/* светлый ободок, чтобы чёрный котик читался на тёмной теме */
+#kotik-body {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    transform-origin: 0 0;
+    filter: drop-shadow(0 0 1.2px rgba(215, 228, 255, 0.95))
+            drop-shadow(0 0 4px rgba(150, 170, 255, 0.35));
+}
+
+.kf {
+    position: absolute;
+    display: none;
+}
+.kf.active {
+    display: block;
+    z-index: 1;
+}
+/* старый кадр растворяется поверх нового: плавный переход между близкими позами */
+.kf.kf-out {
+    display: block;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.14s linear;
+    pointer-events: none;
+}
+.kf img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+}
+
+/* глаза отдельным слоем: форма берётся из спрайта через маску */
+.keye {
+    position: absolute;
+    background-size: 100% 100%;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    transform-origin: 50% 50%;
+    transition: transform 0.06s linear;
+    pointer-events: none;
+}
+.keye.blink {
+    transform: scaleY(0.08);
+}
+.kpupil {
+    position: absolute;
+    border-radius: 50%;
+    background: #0b0b0b;
+    transition: transform 0.2s ease-in-out;
+}
+
+/* крылья */
+.kwings {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+}
+.kwings img {
+    position: absolute;
+    display: none;
+    pointer-events: none;
+}
+.kwings img.on {
+    display: block;
+}
+
+/* анимации тела: точка поворота и масштаба находится в якоре (лапы) */
+.kb-breathe {
+    animation: kotik-breathe 3.2s ease-in-out infinite;
+}
+.kb-slow {
+    animation: kotik-breathe 5.2s ease-in-out infinite;
+}
+.kb-rock {
+    animation: kotik-rock 2.6s ease-in-out infinite;
+}
+.kb-fly {
+    animation: kotik-fly 0.55s ease-in-out infinite;
+}
+.kb-pop {
+    animation: kotik-pop 0.3s ease-out 1;
+}
+
+@keyframes kotik-breathe {
+    0%, 100% { transform: scale(1, 1); }
+    50%      { transform: scale(1.015, 0.975); }
+}
+@keyframes kotik-rock {
+    0%, 100% { transform: rotate(-4deg); }
+    50%      { transform: rotate(4deg); }
+}
+@keyframes kotik-fly {
+    0%, 100% { transform: rotate(-3deg); }
+    50%      { transform: rotate(3deg); }
+}
+@keyframes kotik-pop {
+    0%   { transform: scale(1.12, 0.84); }
+    55%  { transform: scale(0.95, 1.08); }
+    100% { transform: scale(1, 1); }
+}
+
+/* zzz над спящим */
+.kzzz {
+    position: absolute;
+    font: 700 16px/1 sans-serif;
+    color: #cfd6ff;
+    text-shadow: 0 0 4px #000;
+    opacity: 0;
+    pointer-events: none;
+    display: none;
+}
+#kotik-root.sleeping .kzzz {
+    display: block;
+    animation: kotik-zzz 3.2s ease-out infinite;
+}
+#kotik-root.sleeping .kzzz:nth-child(2) { animation-delay: 1.05s; }
+#kotik-root.sleeping .kzzz:nth-child(3) { animation-delay: 2.1s; }
+@keyframes kotik-zzz {
+    0%   { opacity: 0; transform: translate(0, 0) scale(0.6); }
+    20%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(14px, -34px) scale(1.2); }
+}
+
+/* кнопка «Покормить» над голодным котиком */
+.kotik-ui {
+    pointer-events: auto;
+}
+#kotik-hint {
+    position: absolute;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    border: 8px solid transparent;
+    border-image: url("assets/ui/btn_hot.png") 4 fill / 8px;
+    image-rendering: pixelated;
+    background: none;
+    padding: 0 2px;
+    color: #e8f0d0;
+    font: 600 12px/1.2 var(--kfont);
+    text-shadow: 1px 1px 0 #0b0b10;
+    cursor: pointer;
+    display: none;
+    animation: kotik-hint 1.2s steps(2) infinite;
+}
+#kotik-hint.show {
+    display: block;
+}
+@keyframes kotik-hint {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%      { transform: translateX(-50%) translateY(-3px); }
+}
+
+/* домик: лежанка и будка */
+#kotik-home {
+    position: fixed;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
+}
+
+/* коробка, сыр, крошки */
+.kitem {
+    position: fixed;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+#kotik-box {
+    cursor: grab;
+    touch-action: none;
+    z-index: 8999;
+    animation: kotik-boxin 0.35s ease-out 1;
+    transform-origin: 50% 100%;
+}
+@keyframes kotik-boxin {
+    0%   { transform: scale(0.2); opacity: 0; }
+    70%  { transform: scale(1.08); opacity: 1; }
+    100% { transform: scale(1); }
+}
+#kotik-cheese {
+    cursor: grab;
+    z-index: 9100;
+    touch-action: none;
+    filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45));
+}
+#kotik-cheese.drag {
+    cursor: grabbing;
+}
+#kotik-crumbs {
+    z-index: 8998;
+    pointer-events: none;
+    animation: kotik-crumbs 4s ease-in 1 forwards;
+}
+@keyframes kotik-crumbs {
+    0%, 60% { opacity: 1; }
+    100%    { opacity: 0; }
+}
+
+
+/* ===================== Окно тамагочи (пиксель-арт) ===================== */
+:root {
+    --kfont: "Pixelify Sans", "Press Start 2P", Consolas, "Courier New", monospace;
+}
+
+.kwin, .kbubble, .ktoggle, .kw-btn, .kw-in {
+    image-rendering: pixelated;
+}
+
+.kwin {
+    position: fixed;
+    z-index: 9200;
+    width: 320px;
+    box-sizing: border-box;
+    border: 16px solid transparent;
+    border-image: url("assets/ui/panel.png") 8 fill / 16px / 0 stretch;
+    padding: 0 2px 2px;
+    color: #e8f0d0;
+    font: 600 12px/1.25 var(--kfont);
+    letter-spacing: 0.3px;
+    text-shadow: 1px 1px 0 #0b0b10;
+    filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.45));
+    display: flex;
+    flex-direction: column;
+}
+.kwin > * { flex: none; }
+.kwin img {
+    image-rendering: pixelated;
+    -webkit-user-drag: none;
+    user-select: none;
+}
+
+.kw-title {
+    cursor: move;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 6px;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: #b4e03c;
+}
+.kw-ico { width: 28px; height: 28px; flex: none; }
+.kw-x { margin-left: auto; }
+
+.kw-stats {
+    margin: 4px;
+    padding: 6px 8px;
+    background: #0d0d12;
+    box-shadow: 0 0 0 2px #0b0b10, 0 0 0 4px #3a3a48;
+}
+.kw-row {
+    display: grid;
+    grid-template-columns: 28px 62px 1fr 38px;
+    align-items: center;
+    gap: 6px;
+    margin: 3px 0;
+}
+.kw-val { text-align: right; }
+.kw-bar {
+    display: flex;
+    gap: 2px;
+    height: 14px;
+    padding: 2px;
+    background: #0b0b10;
+    box-shadow: 0 0 0 2px #3a3a48;
+}
+.kw-seg {
+    flex: 1;
+    background: #23232b;
+}
+.kw-seg.on {
+    background: #b4e03c;
+    box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.28), inset 0 2px 0 rgba(255, 255, 255, 0.28);
+}
+.kw-bar[data-level="mid"] .kw-seg.on { background: #f0c84a; }
+.kw-bar[data-level="low"] .kw-seg.on { background: #e0708c; animation: kw-blink 1s steps(2) infinite; }
+@keyframes kw-blink { 50% { opacity: 0.45; } }
+
+.kw-actions {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    margin: 8px 4px 2px;
+}
+
+.kw-btn {
+    box-sizing: border-box;
+    border: 8px solid transparent;
+    border-image: url("assets/ui/btn.png") 4 fill / 8px;
+    background: none;
+    color: #e8f0d0;
+    font: inherit;
+    text-shadow: 1px 1px 0 #0b0b10;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+.kw-btn:hover { border-image-source: url("assets/ui/btn_hot.png"); }
+.kw-btn:active { border-image-source: url("assets/ui/btn_down.png"); }
+.kw-btn:disabled { opacity: 0.5; cursor: default; }
+.kw-act { flex-direction: column; gap: 0; font-size: 11px; }
+.kw-act .kw-ico { width: 14px; height: 14px; }
+.kw-x { padding: 0; }
+.kw-x .kw-ico { width: 14px; height: 14px; }
+.kw-send { width: 48px; flex: none; }
+.kw-send .kw-ico { width: 14px; height: 14px; }
+
+.kw-div {
+    height: 14px;
+    margin: 6px 4px 4px;
+    background: url("assets/ui/i_paw_dim.png") 0 0 / 14px 14px repeat-x;
+    image-rendering: pixelated;
+    opacity: 0.9;
+}
+
+.kw-log {
+    flex: 1 1 150px;
+    min-height: 60px;
+    overflow-y: auto;
+    margin: 2px 4px 6px;
+    padding: 6px;
+    background: #0d0d12;
+    box-shadow: 0 0 0 2px #0b0b10, 0 0 0 4px #3a3a48;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.kw-log::-webkit-scrollbar { width: 8px; }
+.kw-log::-webkit-scrollbar-track { background: #0b0b10; }
+.kw-log::-webkit-scrollbar-thumb { background: #6fae2a; }
+
+.kw-msg {
+    max-width: 88%;
+    box-sizing: border-box;
+    border: 6px solid transparent;
+    padding: 1px 3px;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+.kw-cat {
+    align-self: flex-start;
+    border-image: url("assets/ui/bubble.png") 4 fill / 6px;
+}
+.kw-you {
+    align-self: flex-end;
+    border-image: url("assets/ui/bubble_you.png") 4 fill / 6px;
+}
+.kw-cat.kw-auto { color: #c9d0ff; }
+.kw-sys { align-self: stretch; color: #e0708c; font-size: 11px; }
+.kw-temp { animation: kw-blink 0.8s steps(2) infinite; }
+
+.kw-form {
+    display: flex;
+    gap: 6px;
+    margin: 0 4px 2px;
+    align-items: stretch;
+}
+.kw-in {
+    flex: 1;
+    min-width: 0;
+    background: #0d0d12;
+    border: 0;
+    border-radius: 0;
+    box-shadow: 0 0 0 2px #0b0b10, 0 0 0 4px #3a3a48;
+    color: #e8f0d0;
+    font: inherit;
+    padding: 6px 8px;
+    outline: none;
+}
+.kw-in:focus { box-shadow: 0 0 0 2px #0b0b10, 0 0 0 4px #b4e03c; }
+.kw-in::placeholder { color: #6a6a7c; }
+
+/* кнопка-лапка у домика */
+.ktoggle {
+    position: fixed;
+    z-index: 9150;
+    box-sizing: border-box;
+    width: 30px;
+    height: 30px;
+    border: 8px solid transparent;
+    border-image: url("assets/ui/btn.png") 4 fill / 8px;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    display: block;
+}
+.ktoggle:hover, .ktoggle.on { border-image-source: url("assets/ui/btn_hot.png"); }
+.ktoggle-ico { display: block; width: 14px; height: 14px; image-rendering: pixelated; pointer-events: none; }
+
+/* облачко над котиком */
+.kbubble {
+    position: fixed;
+    z-index: 9210;
+    box-sizing: border-box;
+    max-width: 230px;
+    border: 6px solid transparent;
+    border-image: url("assets/ui/bubble.png") 4 fill / 6px;
+    padding: 2px 4px;
+    color: #e8f0d0;
+    font: 600 12px/1.3 var(--kfont);
+    text-shadow: 1px 1px 0 #0b0b10;
+    cursor: pointer;
+    animation: kbubble-in 0.18s steps(3) 1;
+}
+.kbubble-text { word-break: break-word; }
+.kbubble-tail {
+    position: absolute;
+    bottom: -17px;
+    width: 20px;
+    height: 12px;
+    image-rendering: pixelated;
+}
+@keyframes kbubble-in { 0% { opacity: 0; } 100% { opacity: 1; } }
+
+.kwin > .kw-log { flex: 1 1 150px; }
+.kw-grip {
+    position: absolute;
+    right: -6px;
+    bottom: -6px;
+    width: 16px;
+    height: 16px;
+    background: url("assets/ui/grip.png") center / 16px 16px no-repeat;
+    image-rendering: pixelated;
+    cursor: nwse-resize;
+    z-index: 2;
+}
+
+/* рука при поглаживании, мурчание и сердечки */
+.khand {
+    position: absolute;
+    display: none;
+    pointer-events: none;
+    transform-origin: 50% 100%;
+}
+.khand.on {
+    display: block;
+    animation: khand-in 0.4s ease-out 1, khand-stroke 0.85s ease-in-out 0.4s infinite;
+}
+@keyframes khand-in {
+    0%   { transform: translateX(110%); opacity: 0; }
+    100% { transform: none; opacity: 1; }
+}
+@keyframes khand-stroke {
+    0%, 100% { transform: translateX(-12%) rotate(-2deg); }
+    50%      { transform: translateX(14%) rotate(2deg); }
+}
+.kb-purr {
+    animation: kotik-purr 0.12s steps(2) infinite !important;
+}
+@keyframes kotik-purr {
+    0%   { transform: translate(0, 0); }
+    100% { transform: translate(0, 1px); }
+}
+.kheart {
+    position: fixed;
+    width: 14px;
+    height: 14px;
+    image-rendering: pixelated;
+    pointer-events: none;
+    z-index: 9120;
+    animation: kheart 1.6s ease-out 1 forwards;
+}
+@keyframes kheart {
+    0%   { opacity: 0; transform: translateY(0) scale(0.6); }
+    15%  { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-28px) scale(1.1); }
+}
+
+/* ===================== Панель настроек в «Расширениях» ===================== */
+.kset {
+    --k-accent: #b4e03c;
+    --k-accent-soft: rgba(180, 224, 60, 0.16);
+    --k-pink: #e0708c;
+    --k-line: var(--SmartThemeBorderColor, #3a3a48);
+    --k-text: var(--SmartThemeBodyColor, #e8f0d0);
+    --k-card: rgba(0, 0, 0, 0.22);
+}
+.kset .inline-drawer-content { padding: 10px 6px 12px; }
+.kset small, .kset .kset-note {
+    display: block;
+    margin-top: 4px;
+    opacity: 0.68;
+    font-size: 0.84em;
+    line-height: 1.35;
+}
+.kset .kset-note.err { color: var(--k-pink); opacity: 1; }
+.kset label { display: block; }
+
+/* шапка: аватар, имя, главный выключатель */
+.kset-hero {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    background: var(--k-card);
+    border: 2px solid var(--k-line);
+    border-radius: 6px;
+}
+.kset-avatar {
+    flex: none;
+    width: 58px;
+    height: 58px;
+    border: 2px solid var(--k-accent);
+    border-radius: 4px;
+    background: #17171d no-repeat 50% 17% / 118%;
+}
+.kset-hero-main { flex: 1; min-width: 0; }
+.kset-hero-main .text_pole { width: 100%; box-sizing: border-box; font-weight: 600; }
+
+/* вкладки */
+.kset-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 12px;
+    border-bottom: 2px solid var(--k-line);
+}
+.kset-tab {
+    background: transparent;
+    color: var(--k-text);
+    opacity: 0.6;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    padding: 8px 2px;
+    font: inherit;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+.kset-tab:hover { opacity: 0.9; }
+.kset-tab.on { opacity: 1; color: var(--k-accent); border-bottom-color: var(--k-accent); font-weight: 600; }
+.kset-pane { display: none; }
+.kset-pane.on { display: block; }
+
+/* карточки */
+.kset-card {
+    margin-top: 10px;
+    padding: 10px 12px 12px;
+    background: var(--k-card);
+    border: 2px solid var(--k-line);
+    border-radius: 6px;
+}
+.kset-card h4 {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 0 6px;
+    font-size: 0.76em;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--k-accent);
+}
+.kset-card h4::before {
+    content: '';
+    width: 14px;
+    height: 14px;
+    background: url("assets/ui/i_paw.png") center / contain no-repeat;
+    image-rendering: pixelated;
+}
+
+/* ползунки: подпись слева, значение справа, сам ползунок во всю ширину */
+.kset-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 8px;
+    align-items: center;
+    margin-top: 10px;
+}
+.kset-row.off { opacity: 0.4; pointer-events: none; }
+.kset-row label { margin: 0; font-size: 0.92em; }
+.kset-row input[type="range"] { grid-column: 1 / -1; width: 100%; margin: 0; accent-color: var(--k-accent); }
+.kset-chip {
+    min-width: 3.4em;
+    padding: 1px 8px;
+    text-align: center;
+    font: 600 0.85em ui-monospace, Consolas, monospace;
+    color: var(--k-accent);
+    background: rgba(0, 0, 0, 0.32);
+    border: 1px solid var(--k-line);
+    border-radius: 3px;
+}
+
+/* строка с переключателем */
+.kset-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 4px;
+}
+.kset-line-text { flex: 1; min-width: 0; }
+.kset-line-text small { margin-top: 2px; }
+
+/* переключатель */
+.kswitch { position: relative; display: inline-block; flex: none; width: 44px; height: 24px; margin: 0; cursor: pointer; }
+.kswitch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.kswitch span {
+    position: absolute;
+    inset: 0;
+    background: #23232b;
+    border: 2px solid var(--k-line);
+    border-radius: 3px;
+    transition: background 0.15s, border-color 0.15s;
+}
+.kswitch span::after {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 16px;
+    height: 16px;
+    background: #8d8da0;
+    transition: transform 0.15s, background 0.15s;
+}
+.kswitch input:checked + span { background: #2f4818; border-color: var(--k-accent); }
+.kswitch input:checked + span::after { transform: translateX(20px); background: var(--k-accent); }
+.kswitch input:focus-visible + span { outline: 2px solid var(--k-accent); outline-offset: 2px; }
+.kswitch-big { width: 54px; height: 28px; }
+.kswitch-big span::after { width: 20px; height: 20px; }
+.kswitch-big input:checked + span::after { transform: translateX(26px); }
+
+/* выбор модели: три кнопки в одной рамке */
+.kseg { display: flex; border: 2px solid var(--k-line); border-radius: 4px; overflow: hidden; }
+.kseg button {
+    flex: 1;
+    padding: 8px 4px;
+    background: transparent;
+    color: var(--k-text);
+    border: 0;
+    font: inherit;
+    cursor: pointer;
+}
+.kseg button + button { border-left: 2px solid var(--k-line); }
+.kseg button:hover { background: rgba(255, 255, 255, 0.05); }
+.kseg button.on { background: var(--k-accent-soft); color: var(--k-accent); font-weight: 600; }
+
+.kset-mode { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--k-line); }
+.kset-mode.on { display: block; }
+.kset-mode label { margin-top: 10px; font-size: 0.9em; }
+.kset-mode label:first-child { margin-top: 0; }
+.kset-inline { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+.kset-inline .text_pole, .kset-inline select { flex: 1; min-width: 0; margin: 0; }
+.kset .text_pole { box-sizing: border-box; }
+.kset textarea.text_pole { width: 100%; resize: vertical; }
+.kset-mode .text_pole { width: 100%; margin-top: 4px; }
+.kset-inline .text_pole { width: auto; margin-top: 0; }
+
+.kset-presets { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 0.85em; margin-bottom: 8px; }
+.kset-presets > span { opacity: 0.7; }
+.kset-presets .kbtn { margin: 0; }
+.kset-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+
+.kset-status { font-size: 0.9em; min-width: 0; overflow-wrap: anywhere; }
+.kset-status.ok { color: var(--k-accent); }
+.kset-status.err { color: var(--k-pink); }
+.kset-status.busy { animation: kw-blink 0.9s steps(2) infinite; }
+
+/* кнопка «Кофе»: при пяти кнопках шрифт и рамка чуть меньше */
+.kw-actions5 .kw-act { font-size: 9px; border-width: 6px; }
+.kw-actions5 .kw-act .kw-ico { width: 13px; height: 13px; }
+.kw-buff {
+    margin-left: auto;
+    padding: 1px 6px;
+    font-size: 10px;
+    letter-spacing: 0;
+    color: #f0c84a;
+    border: 2px solid #3a3a48;
+    background: #0d0d12;
+    white-space: nowrap;
+}
+.kw-buff + .kw-x { margin-left: 6px; }
+.kcup {
+    position: fixed;
+    z-index: 9125;
+    image-rendering: pixelated;
+    pointer-events: none;
+    animation: kcup 3.4s steps(10) 1 forwards;
+}
+@keyframes kcup {
+    0%   { opacity: 0; transform: translateY(6px); }
+    10%  { opacity: 1; transform: none; }
+    85%  { opacity: 1; transform: none; }
+    100% { opacity: 0; transform: translateY(-5px); }
+}
+
+/* ---------- кнопки настроек: компактные, в стиле окна тамагочи ---------- */
+.kset .kbtn {
+    appearance: none;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex: none;
+    height: 28px;
+    padding: 0 12px;
+    margin: 0;
+    background: #20202a;
+    color: var(--k-text);
+    border: 2px solid var(--k-line);
+    border-radius: 3px;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.55);
+    font: 600 12px/1 inherit;
+    font-family: inherit;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: border-color 0.12s, background 0.12s, color 0.12s;
+}
+.kset .kbtn:hover {
+    border-color: var(--k-accent);
+    background: var(--k-accent-soft);
+    color: var(--k-accent);
+}
+.kset .kbtn:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
+.kset .kbtn:focus-visible { outline: 2px solid var(--k-accent); outline-offset: 2px; }
+.kset .kbtn.busy { opacity: 0.5; pointer-events: none; }
+.kset .kbtn-main {
+    background: var(--k-accent-soft);
+    border-color: var(--k-accent);
+    color: var(--k-accent);
+}
+.kset .kbtn-main:hover { background: rgba(180, 224, 60, 0.28); }
+.kset .kbtn-sm { height: 22px; padding: 0 9px; font-size: 11px; }
+.kset .kset-inline .kbtn { align-self: stretch; height: auto; min-height: 28px; }
+.kset .kset-actions { gap: 8px; }
+.kset .kset-actions .kbtn { flex: 0 0 auto; }
