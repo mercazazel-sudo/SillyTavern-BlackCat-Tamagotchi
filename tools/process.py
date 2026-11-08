@@ -196,22 +196,30 @@ for i in range(1, n + 1):
 comps.sort()
 print("крыльев найдено:", len(comps))
 WS = 1.0
-# корни крыльев (середина между левым и правым) в координатах листа, подобраны по картинке
-PIVOTS = [(173, 438), (506, 410), (865, 447)]
+# Кот в кадре полёта нарисован в профиль, поэтому от пары «вид со спины» берём ОДНО крыло:
+# левое (у основания справа, тянется влево, то есть назад для кота, летящего вправо).
+# Основание = самая верхняя точка в правой четверти крыла.
 wmeta = []
 for k, nm in enumerate(["up", "mid", "down"]):
     pair = comps[2 * k:2 * k + 2]
-    mk = np.zeros(wm.shape, bool)
-    for _, i in pair:
-        mk |= (lab == i)
+    mk = (lab == pair[0][1]) & wm
     y0, y1, x0, x1 = bbox(mk, pad=2, shape=wm.shape)
     crop = w[y0:y1, x0:x1].copy()
     crop[..., 3] = np.where(mk[y0:y1, x0:x1] & (crop[..., 3] > 8), crop[..., 3], 0)
+    m2 = crop[..., 3] > 8
+    xs = np.nonzero(m2.any(axis=0))[0]
+    right = xs.max() - 0.22 * (xs.max() - xs.min())
+    ys_r, xs_r = np.nonzero(m2 & (np.arange(m2.shape[1])[None, :] >= right))
+    top = ys_r.min()
+    sel = ys_r < top + 8
+    root_x, root_y = float(xs_r[sel].mean()) - 3, float(top) + 4
+    if nm == 'up':   # у поднятого крыла основание не на кромке, а там, где сходятся жилки (правая середина)
+        root_x, root_y = 136.0, 156.0
     im = resize_rgba(crop, WS)
     im.save(f"{OUT}/wings/{nm}.png", optimize=True)
-    px, py = PIVOTS[k]
     wmeta.append(dict(name=nm, file=f"wings/{nm}.png", w=im.width, h=im.height,
-                      px=(px - x0) * WS, py=(py - y0) * WS))
+                      px=root_x * WS, py=root_y * WS))
+    print("крыло", nm, "размер", im.size, "основание", (round(root_x), round(root_y)))
 meta["wings"] = wmeta
 
 # ---------- предметы ----------
@@ -335,7 +343,8 @@ hs = clean_outline(hs)
 # якорь кота в исходных координатах картинки: центр лежанки и дно её внутреннего пола
 HOME_ANCHOR = (520, 790)
 BED_INTERIOR_W = 410
-factor = 0.8 * meta["frames"]["sleep"]["w"] / BED_INTERIOR_W
+SLEEP_REF_W = 594   # ширина кадра сна, от которой подобран размер домика (чтобы замена кадра домик не меняла)
+factor = 0.8 * SLEEP_REF_W / BED_INTERIOR_W
 y0, y1, x0, x1 = bbox(hs[..., 3] > 8, pad=2, shape=hs.shape)
 crop = hs[y0:y1, x0:x1]
 him = resize_rgba(crop, factor)

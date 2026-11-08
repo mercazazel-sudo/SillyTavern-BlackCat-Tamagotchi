@@ -10,7 +10,7 @@ import { buildSettings } from './settings-ui.js';
 const MODULE = 'kotik';
 const BASE = new URL('.', import.meta.url).href + 'assets/';
 const DEFAULTS = {
-    enabled: true, size: 24,
+    enabled: true, size: 24, glow: true,
     homeEnabled: true, homeScale: 100, homeRight: 12, homeBottom: 6,
     hungerMinutes: 10,
     catName: '', catPrompt: '', lang: 'auto', catMode: 'main', catProfile: 'main', catMaxTokens: 120, chatContext: 4,
@@ -26,7 +26,16 @@ const CHEESE_MIN_PX = 26;
 const HAND_SCALE = 1.0;      // размер руки при поглаживании относительно спрайта
 
 // где крылья крепятся на спине летящего кота (в пикселях спрайта fly) и их масштаб
-const WING = { frame: 'fly', x: 475, y: 438, scale: 1.05, order: ['up', 'mid', 'down', 'mid'], ms: 110 };
+const WING = {
+    frame: 'fly',
+    x: 455, y: 462,          // основание ближнего крыла на спине (в пикселях спрайта fly)
+    scale: 1.2,              // размер крыла относительно кота
+    rot: 38,                 // поворот по часовой: крыло отведено назад вдоль спины, а не свисает с плеча
+    far: false,              // второе (дальнее) крыло: false = не рисовать, оно читалось как тёмная клякса
+    farDx: 30, farDy: -8,    // сдвиг дальнего крыла относительно ближнего
+    farScale: 0.88,
+    order: ['up', 'mid', 'down', 'mid'], ms: 110,
+};
 
 let settings = { ...DEFAULTS };
 let meta = null;
@@ -134,24 +143,34 @@ function buildFrames() {
             width: f.w * k + 'px', height: f.h * k + 'px',
         });
 
+        // крылья: дальнее позади кота и темнее, ближнее поверх него; оба растут из спины (кадр полёта в профиль)
         let wings = null;
+        let nearWings = null;
         if (name === WING.frame) {
-            wings = document.createElement('div');
-            wings.className = 'kwings';
-            const imgs = {};
-            for (const w of meta.wings) {
-                const wi = document.createElement('img');
-                wi.src = BASE + w.file;
-                const s = WING.scale * k;
-                Object.assign(wi.style, {
-                    width: w.w * s + 'px', height: w.h * s + 'px',
-                    left: (WING.x * k - w.px * s) + 'px', top: (WING.y * k - w.py * s) + 'px',
-                });
-                wings.appendChild(wi);
-                imgs[w.name] = wi;
-            }
-            wings._imgs = imgs;
-            el.appendChild(wings);
+            const makeSet = (far) => {
+                const box = document.createElement('div');
+                box.className = 'kwings' + (far ? ' kwings-far' : '');
+                const sc = WING.scale * (far ? WING.farScale : 1) * k;
+                const ax = (WING.x + (far ? WING.farDx : 0)) * k, ay = (WING.y + (far ? WING.farDy : 0)) * k;
+                Object.assign(box.style, { left: ax + 'px', top: ay + 'px', transform: `rotate(${WING.rot + (far ? 6 : 0)}deg)` });
+                const imgs = {};
+                for (const w of meta.wings) {
+                    const wi = document.createElement('img');
+                    wi.src = BASE + w.file;
+                    Object.assign(wi.style, {
+                        width: w.w * sc + 'px', height: w.h * sc + 'px',
+                        left: (-w.px * sc) + 'px', top: (-w.py * sc) + 'px',
+                    });
+                    box.appendChild(wi);
+                    imgs[w.name] = wi;
+                }
+                return { box, imgs, shift: far ? 1 : 0 };
+            };
+            const far = WING.far === false ? null : makeSet(true);
+            const near = makeSet(false);
+            wings = { _sets: [far, near].filter(Boolean) };
+            if (far) el.appendChild(far.box); // позади кота
+            nearWings = near.box;             // ближнее добавим после картинки кота
         }
 
         const img = document.createElement('img');
@@ -159,6 +178,7 @@ function buildFrames() {
         img.alt = '';
         img.draggable = false;
         el.appendChild(img);
+        if (nearWings) el.appendChild(nearWings);
 
         const eyes = [];
         for (const e of f.eyes) {
@@ -236,6 +256,12 @@ function buildDom() {
     pos.append(flip, zzzBox, hint);
     root.appendChild(pos);
     document.body.appendChild(root);
+    applyGlow();
+}
+
+// светлый ободок вокруг кота можно выключить
+function applyGlow() {
+    if (root) root.classList.toggle('kotik-noglow', !settings.glow);
 }
 
 function placeZzz() {
@@ -402,18 +428,23 @@ async function rollEyes(alive) {
 
 /* ---------- крылья ---------- */
 
+// показать крылья в заданной фазе взмаха (дальнее идёт со сдвигом на одну фазу, чтобы не махали синхронно)
+function setWingPhase(i) {
+    const fe = frameEls[WING.frame];
+    if (!fe || !fe.wings) return;
+    for (const set of fe.wings._sets) {
+        const cur_ = WING.order[(i + set.shift) % WING.order.length];
+        for (const n of Object.keys(set.imgs)) set.imgs[n].classList.toggle('on', n === cur_);
+    }
+}
+
 function startWings() {
     stopWings();
     const fe = frameEls[WING.frame];
     if (!fe || !fe.wings) return;
     let i = 0;
-    const tick_ = () => {
-        const imgs = fe.wings._imgs;
-        for (const n of Object.keys(imgs)) imgs[n].classList.toggle('on', n === WING.order[i % WING.order.length]);
-        i++;
-    };
-    tick_();
-    wingTimer = setInterval(tick_, WING.ms);
+    setWingPhase(i++);
+    wingTimer = setInterval(() => setWingPhase(i++), WING.ms);
 }
 
 function stopWings() {
@@ -1305,7 +1336,7 @@ function disable() {
     root.style.display = 'none';
 }
 
-// шестерёнка в окне тамагочи: открыть «Расширения», раскрыть наш раздел, прокрутить к нему и подсветить
+// шестерёнка в окне тамагочи: открыть «Расширения», раскрыть раздел кота, прокрутить к нему и подсветить
 function openExtSettings() {
     try {
         const block = document.getElementById('rm_extensions_block');
@@ -1317,9 +1348,9 @@ function openExtSettings() {
         const wrap = document.querySelector('#extensions_settings2 .kset');
         if (!wrap) { console.warn('[Kotik] раздел настроек не найден'); return; }
         const header = wrap.querySelector(':scope > .inline-drawer > .inline-drawer-header');
-        const icon = header && header.querySelector('.inline-drawer-icon');
-        const opened = !!icon && icon.classList.contains('up');
-        if (header && !opened) header.click();
+        const content = wrap.querySelector(':scope > .inline-drawer > .inline-drawer-content');
+        // карточка свёрнута, если её содержимое скрыто (надёжнее, чем смотреть на иконку)
+        if (header && content && getComputedStyle(content).display === 'none') header.click();
         setTimeout(() => {
             wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
             wrap.classList.remove('kset-flash');
@@ -1348,6 +1379,7 @@ function buildSettingsPanel() {
             onName: name => { if (panel) panel.setName(name); },
             onSize: () => { if (ready) { removeBox(); buildFrames(); reposition(); } },
             onHome: () => { if (ready) reposition(); },
+            onGlow: () => applyGlow(),
             onUiScale: z => { if (panel) panel.setScale(z); },
             onFly: () => scheduleFly(false),
             onCoffee: v => { if (panel) panel.setCoffee(v); if (!v) { settings.coffeeUntil = 0; saveSettings(); } updateBuff(); },
@@ -1406,7 +1438,7 @@ async function init() {
         globalThis.__kotik = {
             state: () => ({ x, y, cur, inBed, hungry, home, token, drag: !!drag, size: settings.size, stats, standX: standX(), flyInMin: Math.round((nextFlyAt - Date.now()) / 600) / 100 }),
             go, show, becomeHungry, toggleBox, openBox, feed, panel, stat,
-            bWake, bFly, bPlay, bLaugh, bEat, bStretch, bSleep, bActivity, bDrop, bPetted, bWakeUp, bLick, bSit, sitTilt, springBody, bCoffee, drinkCoffee, updateBuff, openExtSettings, giveItem, pet, reactLaugh, onPanelSend,
+            bWake, bFly, bPlay, bLaugh, bEat, bStretch, bSleep, bActivity, bDrop, bPetted, bWakeUp, bLick, bSit, sitTilt, springBody, setWingPhase, startWings, stopWings, bCoffee, drinkCoffee, updateBuff, openExtSettings, giveItem, pet, reactLaugh, onPanelSend,
         };
         if (settings.enabled) enable(); else root.style.display = 'none';
         console.log('[Kotik] v0.6 загружен');

@@ -77,6 +77,7 @@ export function buildSettings({ host, base, settings, save, hooks }) {
                 <section class="kset-card">
                     <h4>${t('set.look.cat')}</h4>
                     ${slider('kset_size', t('set.look.size'), 12, 120, 2)}
+                    ${toggle('kset_glow', t('set.look.glow'), t('set.look.glowHint'))}
                 </section>
                 <section class="kset-card">
                     <h4>${t('set.look.home')}</h4>
@@ -252,6 +253,7 @@ export function buildSettings({ host, base, settings, save, hooks }) {
 
     /* ---------- вид ---------- */
     bindSlider('kset_size', () => settings.size, v => { settings.size = v; }, v => `${v} px`, () => hooks.onSize());
+    bindSwitch('kset_glow', () => settings.glow, v => { settings.glow = v; }, () => hooks.onGlow());
     bindSwitch('kset_home_on', () => settings.homeEnabled, v => { settings.homeEnabled = v; }, () => { hooks.onHome(); syncHomeEnabled(); });
     bindSlider('kset_home_scale', () => settings.homeScale, v => { settings.homeScale = v; }, v => `${v}%`, () => hooks.onHome());
     const syncHomeEnabled = () => $('#kset_home_scale').closest('.kset-row').classList.toggle('off', !settings.homeEnabled);
